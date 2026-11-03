@@ -1,0 +1,704 @@
+<title>Roundknoll Farm Tabletop</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap">
+<style>
+/* Layout: full-bleed 3D stage, era switch top-left, controls strip bottom, status line when loading.
+   Palette: night slate stage, aged-paper text, survey-ink blue for 1957, field green for today. */
+:root{
+  --bg:#12161a; --panel:rgba(20,26,31,.82); --line:rgba(231,222,200,.16);
+  --fg:#f4efe2; --muted:#cdc6b4; --ink57:#d9c9a3; --today:#8fbf7a; --accent:#e8c26b;
+  --display:"Source Serif 4",Georgia,serif; --ui:"IBM Plex Sans",system-ui,sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 var(--ui);overflow:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));box-sizing:border-box}
+#stage{position:fixed;inset:0;display:block;width:100%;height:100%;touch-action:none}
+.ui{position:fixed;z-index:2;font-family:var(--ui)}
+#head{top:max(14px,env(safe-area-inset-top,0px));left:max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:10px;max-width:calc(100vw - 32px);background:rgba(14,18,22,.84);border:1px solid var(--line);border-radius:14px;padding:12px 16px 12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 2px 14px rgba(0,0,0,.35)}
+h1{margin:0;font:600 24px/1.15 var(--display);letter-spacing:.01em;color:#fff}
+.sub{color:var(--muted);font-size:13.5px;margin:0}
+#yrnote{color:var(--fg);font-size:14px;font-weight:500}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--panel);padding:3px;gap:2px;backdrop-filter:blur(8px)}
+.seg button{all:unset;cursor:pointer;padding:7px 16px;border-radius:999px;font-weight:600;color:var(--fg)}
+.seg button:hover{background:rgba(255,255,255,.08)}
+.seg button:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg button[aria-pressed="true"]{background:var(--fg);color:#16191c}
+.seg{flex-wrap:wrap;max-width:100%}
+#legend{display:flex;gap:6px 14px;flex-wrap:wrap;color:var(--fg);font-size:13px;min-height:0}
+#legend i{display:inline-block;width:18px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+#foot{left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));
+  display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 14px;backdrop-filter:blur(8px)}
+#foot label{display:flex;gap:6px;align-items:center;color:var(--fg);cursor:pointer}
+#sl{flex:1 1 220px;min-width:160px;position:relative;padding-top:20px}
+#blend{width:100%;display:block;margin:0;accent-color:var(--accent)}
+#dlab{position:absolute;top:0;transform:translateX(-50%);font-weight:600;font-size:12px;color:var(--fg);white-space:nowrap;pointer-events:none}
+#ticks{position:relative;height:22px;margin-top:1px}
+#ticks i{position:absolute;top:0;width:1px;height:4px;background:var(--line);transform:translateX(-50%)}
+#ticks i.m{height:7px;background:var(--muted)}
+#ticks b{position:absolute;top:8px;font-weight:500;font-size:10px;color:var(--muted);transform:translateX(-50%)}
+.btn{all:unset;cursor:pointer;padding:7px 14px;border:1px solid var(--line);border-radius:10px;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn[hidden]{display:none}
+#status{top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--muted)}
+#status b{display:block;font:600 18px var(--display);color:var(--fg);margin-bottom:4px}
+#labels{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:2}
+#labels div{position:absolute;left:0;top:0;white-space:nowrap;text-align:center;font:600 11px/1.15 system-ui,sans-serif;color:#fff;background:rgba(20,22,26,.72);padding:2px 6px;border-radius:6px;display:none;will-change:transform}
+#labels div small{display:none;font-weight:500;font-size:10px;opacity:.85}
+#labels div.near small{display:block}
+#note{color:var(--muted);font-size:12.5px;flex-basis:100%;margin:0}
+#tabs{align-self:flex-start}
+body.own #stops,body.own #legend,body.own #yrnote,body.own #foot,body.own #labels,body.own #head .sub{display:none!important}
+#own{position:fixed;inset:0;z-index:1;overflow:auto;background:var(--bg);padding:128px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+#own[hidden]{display:none}
+#own .wrap{max-width:1000px;margin:0 auto}
+#own h2{font:600 26px/1.2 var(--display);margin:0 0 6px;color:#fff}
+#own h3{font:600 17px/1.3 var(--display);margin:30px 0 10px;color:#fff}
+#own p{color:var(--muted);margin:0 0 10px;max-width:70ch;font-size:14.5px}
+#own .wrap{max-width:1180px}
+#own .stk{position:sticky;top:var(--ownStick,0px);z-index:20;background:var(--bg);box-shadow:0 -160px 0 var(--bg);padding:10px 0 10px;border-bottom:1px solid var(--line);margin-bottom:12px}
+#own .stk h2{font-size:22px;margin:0}#own .stk .hint{margin:2px 0 0;font-size:13.5px;max-width:none}
+.olayout{display:grid;grid-template-columns:minmax(340px,460px) minmax(0,1fr);gap:26px;align-items:start}
+.oside{position:sticky;top:calc(var(--ownStick,0px) + var(--stkh,60px) + 10px);height:calc(100vh - var(--ownTop,128px) - var(--stkh,60px) - 26px);min-height:440px;max-height:900px}
+.ochart{height:100%;border:1px solid var(--line);border-radius:14px;background:#262f37;padding:6px 4px}
+.ochart svg{display:block;width:100%;height:100%}.ochart svg text{font-family:var(--ui)}
+.ob,.ochart .ol,.ochart #hm,.ochart #ld path{transition:opacity .15s,filter .15s}.ochart .ol{cursor:pointer}
+.ochart .dim .ob,.ochart .dim .ol,.ochart .dim #hm{opacity:.62}.ochart .dim .ob.on,.ochart .dim .ol.on,.ochart .dim #hm.on{opacity:1}
+.ochart .dim .ob.on{filter:brightness(1.12) drop-shadow(0 0 5px rgba(255,255,255,.55))}.ochart .dim #ld path{opacity:.4}
+.ocards{display:grid;gap:16px}
+.oc{background:#1b2127;border:1px solid var(--line);border-radius:12px;padding:16px 20px;transition:border-color .15s,box-shadow .15s}
+.oc.hot{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.oc .d{font:700 13px var(--ui);letter-spacing:.03em;text-transform:uppercase;color:var(--accent);display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
+.oc .d em{font-style:normal;text-transform:none;letter-spacing:0;color:#ffd23f;border:1px solid #ffd23f;border-radius:999px;padding:0 8px;font-size:12px}
+.oc .t{font:700 19px/1.3 var(--display);color:#fff;margin:2px 0 8px}
+.oc .row{display:grid;grid-template-columns:78px minmax(0,1fr);gap:10px;font-size:14.5px;padding:1.5px 0}
+.oc .row span:first-child{color:var(--muted)}.oc .row span:last-child{overflow-wrap:anywhere}
+.oc .nt{margin-top:10px;border-left:3px solid var(--accent);padding:1px 0 1px 12px;font-size:14.5px}
+.oc.built{border:1.5px dashed #ffd23f;background:rgba(255,210,63,.07)}.oc.built .d{color:#ffd23f}
+.oc .jb{margin-top:10px;font:600 13px var(--ui);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--fg);cursor:pointer}
+@media(max-width:820px){.olayout{grid-template-columns:1fr}.oside{position:static;height:560px;min-height:0}}
+#chart{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03);padding:14px 14px 8px}
+#chart .in{position:relative;min-width:760px}
+#chart .hl{position:absolute;left:0;right:0;height:0;border-top:1.5px dashed #fff;pointer-events:none;display:none;z-index:5}
+#chart .tip{position:absolute;z-index:6;pointer-events:none;display:none;background:rgba(10,12,15,.95);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px;line-height:1.4;max-width:290px;box-shadow:0 4px 18px rgba(0,0,0,.5);color:#f4efe2}
+#chart .tip .y{font:600 16px Georgia,serif;color:#e8c26b;margin-bottom:3px}
+#chart .tip .r span{color:#cdc6b4}#chart .tip .hh{color:#ffd23f}
+.lane{position:relative;height:34px;margin:0 0 6px}
+.lanel{font-size:11.5px;color:var(--muted);height:15px;line-height:15px;margin-top:6px}
+.bar{position:absolute;top:0;height:30px;border-radius:6px;font-size:11.5px;font-weight:600;line-height:30px;padding:0 6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#10130f;box-sizing:border-box;border:1px solid rgba(0,0,0,.25)}
+.bar.open{border-style:dashed}
+.axis{position:relative;height:22px;margin-top:6px;border-top:1px solid var(--line)}
+.axis span{position:absolute;top:4px;transform:translateX(-50%);font-size:11px;color:var(--muted)}
+.axis i{position:absolute;top:0;width:1px;height:5px;background:var(--muted)}
+.k-powell{background:#d8ad6e}.k-meakin{background:#b5a98f}.k-pocock{background:#8fbf9c}.k-albright{background:#86a9d0}.k-cook{background:#c9a0c4}.k-requard{background:#e58b66}.k-lessa{background:#b9d98f}.k-crockett{background:#9fcf7f}.k-wright{background:#d6d38a}.k-kirk{background:#f0cf7a}
+.tl{position:relative;margin:18px 0 0;padding-left:26px;border-left:2px solid var(--line)}
+.ev{position:relative;margin:0 0 18px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.ev::before{content:"";position:absolute;left:-35px;top:18px;width:14px;height:14px;border-radius:50%;background:var(--accent);border:3px solid var(--bg)}
+.ev .d{font:600 13px var(--ui);color:var(--accent);letter-spacing:.04em;text-transform:uppercase}
+.ev .t{font:600 17px/1.3 var(--display);color:#fff;margin:2px 0 6px}
+.ev dl{display:grid;grid-template-columns:max-content 1fr;gap:3px 14px;margin:6px 0 0;font-size:13.5px}
+.ev dt{color:var(--muted)}.ev dd{margin:0;color:var(--fg)}
+.ev .nt{margin-top:8px;font-size:13.5px;color:var(--fg);border-left:3px solid var(--accent);padding-left:10px}
+.ev .nt.unc{border-color:#e58b66;color:#f2cdbd}
+.ev button{all:unset;cursor:pointer;margin-top:10px;padding:5px 12px;border:1px solid var(--accent);border-radius:999px;font-size:12.5px;font-weight:600;color:var(--accent)}
+.ev button:hover{background:rgba(232,194,107,.14)}
+@media (max-width:520px){h1{font-size:19px}.sub{font-size:12.5px}#own{padding-top:150px}}
+</style>
+
+<canvas id="stage" aria-label="3D tabletop model of the farm"></canvas>
+<div id="labels" aria-hidden="true"></div>
+<div id="head" class="ui">
+  <div><h1>Roundknoll Farm Tabletop</h1><p class="sub">Baldwin, Maryland · 1957 landscape, the subdivision plats, and today</p></div>
+  <div class="seg" id="tabs" role="tablist" aria-label="View"><button id="tab3d" role="tab" aria-pressed="true">Tabletop model</button><button id="tabown" role="tab" aria-pressed="false">Owner history</button></div>
+  <div class="seg" id="stops" role="group" aria-label="Timeline stops"></div>
+  <div id="legend"></div>
+  <div id="yrnote" class="sub"></div>
+</div>
+<div id="own" hidden><div class="wrap" id="ownwrap"></div></div>
+<div id="status" class="ui"><b>Loading terrain</b><span id="st">0%</span></div>
+<div id="foot" class="ui">
+  <div id="sl"><div id="dlab"></div><input id="blend" type="range" min="0" max="1" step="0.0025" value="0" aria-label="Timeline"><div id="ticks"></div></div>
+  <label>Height <input id="vex" type="range" min="1" max="3" step="0.1" value="1.5" style="width:110px;accent-color:var(--accent)"> <output id="vexo" style="min-width:3.2em;color:var(--fg)">1.5×</output></label>
+  <label><input id="cplat" type="checkbox" checked> Plat lines</label>
+  <label title="Available at the final (1990) stop"><input id="callp" type="checkbox" disabled> All plats over today</label>
+  <label><input id="ccol" type="checkbox"> Colourise photos (estimated)</label>
+  <label><input id="ctrees" type="checkbox" checked> Trees</label>
+  <label><input id="cbld" type="checkbox" checked> Buildings</label>
+  <label><input id="cdate" type="checkbox" checked> House dates</label>
+  <label><input id="clots" type="checkbox"> 1881 farm lots</label>
+  <button id="bvr" class="btn" hidden>Enter VR</button>
+  <button id="bar" class="btn" hidden>Passthrough</button>
+  <p id="note">Drag to orbit, scroll to zoom, right-drag to pan. The Height slider scales the whole model vertically (1× is true scale). The timeline steps through the recorded subdivision plats (drawn over the 1957 landscape), and from 1961 on today’s houses appear in the year the county records say they were built (Maryland SDAT year built, matched by street address; a few outbuildings take their house’s year). The ground photo fades from the 1957 aerial to the 1964 and then the 1971 aerials (each covers the middle of the map; the edges keep the older photo), and the terrain itself changes patch by patch: each lot switches from the 1957 surface to today’s lidar in the year before its house was built (county year built), while the roads are cut in the year after their plat was approved (1962, 1966, 1968, 1973) – ahead of the houses – so the ground follows the regrading as the subdivision went in. The 2023 aerial replaces the older photos on the regraded patches after 1972, as a soft wipe, and starts in black-and-white to match the older prints before its colour returns. “Colourise photos” gives the old photos an estimated colour borrowed from today’s aerial (interpretive, not original), and “All plats over today” draws every plat at once over the current ground. The 1957 farm buildings and trees fade out toward the end. In the headset, press the trigger to step forward, the grip to toggle true scale, and use the thumbstick to spin the table. Terrain is lidar from 2014 with later regrading removed for 1957. Trees and farm buildings in 1957 are drafted from the aerial photo and are approximate.</p>
+</div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const $ = id => document.getElementById(id);
+const stEl = $('st'), statusBox = $('status');
+const W_M = 990.3, H_M = 988.2, N = 400, VEX = 1, BOT = 10;   // metres across, metres N-S, grid size, vertical exaggeration baked into data (1 = true; the slider scales the whole model's height), base depth (m)
+const SCALE = 0.8 / W_M;                                          // tabletop is 0.8 m wide
+const LIGHT = new THREE.Vector3(-0.5, 0.75, 0.45).normalize();
+
+try {
+  const renderer = new THREE.WebGLRenderer({ canvas: $('stage'), antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  const scene = new THREE.Scene();
+  scene.background = null; renderer.setClearColor(0x12161a, 1);
+  const fog = new THREE.Fog(0xb9c9d6, 5, 28); scene.fog = fog;
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 120);
+  camera.position.set(0.15, 1.35, 0.35);
+  const TABLE_Y = 0.82, CENTER = new THREE.Vector3(0, TABLE_Y, -0.55);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.copy(CENTER); controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.49; controls.minDistance = 0.12; controls.maxDistance = 3;
+
+  // rig spins with the thumbstick; lights live inside it so shading turns with the model
+  const rig = new THREE.Group(); rig.position.copy(CENTER); scene.add(rig);
+  const world = new THREE.Group(); world.scale.setScalar(SCALE); rig.add(world);
+  rig.add(new THREE.HemisphereLight(0xcfe3ff, 0x6b6450, 1.0));
+  const sun = new THREE.DirectionalLight(0xfff0d6, 2.3); sun.position.copy(LIGHT).multiplyScalar(2); rig.add(sun);
+
+  // table and floor for VR only
+  const room = new THREE.Group(); scene.add(room);
+  const table = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.62, 0.03, 64), new THREE.MeshStandardMaterial({ color: 0x2a221b, roughness: 0.8 }));
+  table.position.set(CENTER.x, TABLE_Y - 0.0165 - 0.03, CENTER.z); room.add(table);
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(4, 48).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x1a1f24, roughness: 1 }));
+  room.add(floor); room.visible = false;
+  
+
+  // ---------- data ----------
+  const get = async (u, t) => { const r = await fetch(u); if (!r.ok) throw new Error(u + ' ' + r.status); return t === 'json' ? r.json() : r.arrayBuffer(); };
+  stEl.textContent = 'heights and objects';
+  // heightmaps are lossless PNGs: red = high byte, green = low byte of centimetres above the lowest point
+  const heightPng = u => new Promise((res, rej) => { const im = new Image(); im.onload = () => { const c = document.createElement('canvas'); c.width = c.height = N;
+    const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0); res(x.getImageData(0, 0, N, N).data); }; im.onerror = () => rej(new Error('could not load ' + u)); im.src = u; });
+  const [b57, b23, scn, house, gyd, rqd] = await Promise.all([heightPng('h1957.png'), heightPng('h2023.png'), get('scene.json', 'json'), get('house.json', 'json'), heightPng('gy.png'), heightPng('rqv.png')]);
+  // grading year of each terrain cell (0 = never regraded): the year its 1957 ground becomes today's ground
+  const GY = new Float32Array(N * N); for (let i = 0; i < N * N; i++) GY[i] = gyd[i * 4] > 0 ? Math.min(1900 + gyd[i * 4], 1989) : 0;   // the timeline ends in 1990: lots whose houses came later still show today's ground by then
+  // the 1971 road is built in from Sweet Air Road outward during 1965: RQ = how far along the build the road cell is (0..1), -1 off the road
+  const ROAD0 = 1965.30, ROADSPAN = 0.45;
+  const RQ = new Float32Array(N * N); for (let i = 0; i < N * N; i++) { RQ[i] = rqd[i * 4] > 128 ? rqd[i * 4 + 1] / 255 : -1; if (RQ[i] >= 0) GY[i] = ROAD0 + RQ[i] * ROADSPAN + 0.3; }
+  const RD = new Float32Array(N * N); for (let i = 0; i < N * N; i++) RD[i] = gyd[i * 4 + 1] > 128 ? 1 : 0;
+  const gyAt = (px, py) => GY[Math.round(Math.min(Math.max(py / 1799 * (N - 1), 0), N - 1)) * N + Math.round(Math.min(Math.max(px / 1799 * (N - 1), 0), N - 1))];
+  const toH = d => { const f = new Float32Array(N * N); for (let i = 0; i < N * N; i++) f[i] = (d[i * 4] * 256 + d[i * 4 + 1]) / 100 * VEX; return f; };
+  const Hs = [toH(b57), toH(b23)];             // [1957, today], metres * VEX
+  const cx = W_M / (N - 1), cz = H_M / (N - 1);
+
+  const normalsOf = H => {
+    const n = new Float32Array(N * N * 3);
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      const i0 = Math.max(i - 1, 0), i1 = Math.min(i + 1, N - 1), j0 = Math.max(j - 1, 0), j1 = Math.min(j + 1, N - 1);
+      const dx = (H[j * N + i1] - H[j * N + i0]) / ((i1 - i0) * cx), dz = (H[j1 * N + i] - H[j0 * N + i]) / ((j1 - j0) * cz);
+      const l = Math.hypot(dx, 1, dz), k = (j * N + i) * 3; n[k] = -dx / l; n[k + 1] = 1 / l; n[k + 2] = -dz / l;
+    }
+    return n;
+  };
+  const Ns = [normalsOf(Hs[0]), normalsOf(Hs[1])];
+
+  // bilinear terrain height at photo pixel (0..1799) for era e
+  const hAt = (e, px, py) => {
+    const fi = Math.min(Math.max(px / 1799 * (N - 1), 0), N - 1.001), fj = Math.min(Math.max(py / 1799 * (N - 1), 0), N - 1.001);
+    const i = fi | 0, j = fj | 0, a = fi - i, b = fj - j, H = Hs[e];
+    return (H[j * N + i] * (1 - a) + H[j * N + i + 1] * a) * (1 - b) + (H[(j + 1) * N + i] * (1 - a) + H[(j + 1) * N + i + 1] * a) * b;
+  };
+  const MX = scn.mx, MY = scn.my;
+  const wx = px => (px - 900) * MX, wz = py => (py - 900) * MY;
+
+  // ---------- textures ----------
+  stEl.textContent = 'aerial photos';
+  const loader = new THREE.TextureLoader();
+  const loadTex = u => new Promise((res, rej) => loader.load(u, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); res(t); }, undefined, rej));
+  const [t57, t23, tPA, tPB, t64, t71] = await Promise.all([loadTex('tex1957c.jpg'), loadTex('tex2023.jpg'), loadTex('plats_a.png'), loadTex('plats_b.png'), loadTex('tex1964c.jpg'), loadTex('tex1971c.jpg')]);
+  const tG = await loadTex('gyc.png'); tG.colorSpace = THREE.NoColorSpace; tG.generateMipmaps = false; tG.minFilter = THREE.LinearFilter; tG.magFilter = THREE.LinearFilter;
+  const tR = await loadTex('rdq.png'); tR.colorSpace = THREE.NoColorSpace; tR.generateMipmaps = false; tR.minFilter = THREE.LinearFilter; tR.magFilter = THREE.LinearFilter;
+  const tL = await loadTex('lotm.png'); tL.colorSpace = THREE.NoColorSpace; tL.generateMipmaps = false; tL.minFilter = THREE.LinearFilter; tL.magFilter = THREE.LinearFilter;
+  const tLt = await loadTex('lots.png'); tLt.colorSpace = THREE.NoColorSpace; tLt.generateMipmaps = false; tLt.minFilter = THREE.LinearFilter; tLt.magFilter = THREE.LinearFilter;
+  const uLots = { value: 0 };
+  const uCol = { value: 0 }, uSat = { value: 0 }, uOne = { value: 0 };
+  const uA = { value: 0 }, uB = { value: 0 };   // blend from the 1957 aerial to the 1964 aerial
+  for (const tx of [tPA, tPB]) { tx.colorSpace = THREE.NoColorSpace; tx.generateMipmaps = true; tx.minFilter = THREE.LinearMipmapLinearFilter; }
+  const uPl = { value: new THREE.Vector4(0, 0, 0, 0) };   // alpha of 1965, 1967, 1972 lines; w = 1972 active (use the 1967 plan clipped to what 1972 did not replat)
+
+  // ---------- terrain + base ----------
+  const uT = { value: 0 }, uEx = { value: 1.5 }, uYr = { value: 1957 };
+  // sky dome: gradient, sun, soft clouds; warmer and paler for 1957
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(60, 32, 16), new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, fog: false,
+    uniforms: { uT, uSun: { value: LIGHT.clone() } },
+    vertexShader: 'varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: `uniform float uT; uniform vec3 uSun; varying vec3 vP;
+      float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
+        return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y); }
+      float fbm(vec2 p){ float a = 0.5, s = 0.0; for(int i = 0; i < 5; i++){ s += a * vn(p); p *= 2.03; a *= 0.5; } return s; }
+      void main(){ vec3 d = normalize(vP); float h = d.y;
+        vec3 zen = mix(vec3(0.43, 0.52, 0.66), vec3(0.17, 0.40, 0.78), uT);
+        vec3 hor = mix(vec3(0.82, 0.80, 0.74), vec3(0.74, 0.85, 0.94), uT);
+        vec3 c = mix(hor, zen, pow(clamp(h, 0.0, 1.0), 0.5));
+        c = mix(c, vec3(0.30, 0.34, 0.33), smoothstep(0.0, -0.3, h));
+        float sd = max(dot(d, normalize(uSun)), 0.0);
+        c += vec3(1.0, 0.9, 0.7) * (pow(sd, 700.0) * 2.5 + pow(sd, 14.0) * 0.18);
+        vec2 cp = d.xz / (h + 0.28) * 1.7 + vec2(3.0, 1.0);
+        float cl = smoothstep(0.52, 0.85, fbm(cp)) * smoothstep(0.03, 0.3, h);
+        c = mix(c, mix(vec3(0.95), vec3(1.0), uT), cl * 0.75);
+        gl_FragColor = vec4(c, 1.0);
+        #include <colorspace_fragment>
+      }` }));
+  sky.renderOrder = -10; scene.add(sky);
+  const vert = `
+    uniform float uT; uniform float uBot; uniform float uEx; uniform float uYr; uniform float uA; uniform float uB; attribute float h0; attribute float h1; attribute float top; attribute float gy; attribute float rd; attribute float rq; attribute vec3 n0; attribute vec3 n1;
+    varying vec2 vUv; varying vec3 vN; varying float vWc;
+    void main(){ vUv = uv;
+      float w = gy > 0.5 ? smoothstep(gy - 1.0, gy + 0.6, uYr) : uT;
+      if (rq >= 0.0) { float y0 = 1965.30 + rq * 0.45; w = smoothstep(y0, y0 + 0.2, uYr); }   // the road ground is cut as the road is built outward from Sweet Air Road (summer 1965), finished before 1966
+      float gc = max(gy, 1973.0); vWc = gy > 0.5 ? smoothstep(gc - 1.0, gc + 0.6, uYr) : uT;   // ground photo switches to the 2023 aerial after 1966 (the 1964 photo covers the earlier years)
+      vec3 nn = normalize(mix(n0, n1, w)); vN = normalize(vec3(nn.x, nn.y / uEx, nn.z));
+      float h = top > 0.5 ? mix(h0, h1, w) : -uBot;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position.x, h, position.z, 1.0); }`;
+  const frag = `
+    uniform float uT; uniform sampler2D t57; uniform sampler2D t64; uniform sampler2D t71; uniform float uA; uniform float uB; uniform sampler2D t23; uniform sampler2D tPA; uniform sampler2D tPB; uniform vec4 uPl; uniform vec3 uL; uniform float uSkirt; uniform sampler2D tG; uniform sampler2D tR; uniform sampler2D tL; uniform sampler2D tLt; uniform float uLots; uniform float uYr; uniform float uCol; uniform float uSat; uniform float uOne;
+    varying vec2 vUv; varying vec3 vN; varying float vWc;
+    void main(){ float nd = max(dot(normalize(vN), uL), 0.0); float lit = 0.42 + 0.68 * nd;
+      vec4 rr = texture2D(tR, vUv); float rt = rr.r * smoothstep(1965.30 + rr.g * 0.45, 1965.50 + rr.g * 0.45, uYr);
+      vec4 lm = texture2D(tL, vUv); rt = max(rt, lm.g * smoothstep(lm.r * 80.0 + 1949.0, lm.r * 80.0 + 1950.0, uYr));   // each house's lot (driveway, yard) shows the 1971 photo in the year its house goes up   // the 1971 road surface alone, laid in from Sweet Air Road
+      vec3 a = mix(mix(texture2D(t57, vUv).rgb, texture2D(t64, vUv).rgb, uA), texture2D(t71, vUv).rgb, max(uB, rt)) * vec3(1.04, 1.0, 0.9);
+      vec3 b = texture2D(t23, vUv).rgb * 1.12;
+      const vec3 LW = vec3(0.2126, 0.7152, 0.0722);
+      a = mix(vec3(dot(a, LW)), a, uCol);                                    // old photos are black-and-white unless colourised
+      float lb = clamp(dot(b, LW) * 1.172 + 0.155, 0.0, 1.0);                // today's photo, tone-matched to the 1971 print, gains its colour over the later years
+      b = mix(vec3(lb), b, max(uSat, uCol));
+      vec4 gt = texture2D(tG, vUv); float gyr = min(max(gt.r * 80.0 + 1950.0, 1973.0), 1989.0);     // smoothed grading-year field: the photo changes over as a soft wipe
+      float wc = mix(uT, smoothstep(gyr - 1.0, gyr + 0.6, uYr), smoothstep(0.04, 0.4, gt.g));
+      vec3 c = mix(a, b, wc); if (uSkirt > 0.5) c = vec3(0.12, 0.093, 0.07);
+      vec3 col = c * lit;
+      if (uSkirt < 0.5) {
+        vec3 pa = texture2D(tPA, vUv).rgb; float pb = texture2D(tPB, vUv).r, m4 = clamp(pb * uPl.w, 0.0, 1.0);
+        float m1 = clamp(pa.r * uPl.x, 0.0, 1.0), m2 = clamp(pa.g * uPl.y, 0.0, 1.0), m3 = clamp(pa.b * uPl.z, 0.0, 1.0);
+        col = mix(col, vec3(0.90, 0.55, 0.10), m1 * 0.95);
+        col = mix(col, vec3(0.20, 0.55, 0.85), m2 * 0.95);
+        col = mix(col, vec3(0.95, 0.28, 0.20), m3 * 0.95);
+        col = mix(col, vec3(0.70, 0.48, 0.95), m4 * 0.95);
+        if (uLots > 0.5) { vec2 lt = texture2D(tLt, vUv).rg; col = mix(col, vec3(0.23, 0.55, 1.0), lt.g * 0.0 + lt.r * 0.85); col = mix(col, vec3(1.0, 0.60, 0.18), lt.g * 0.85); }
+        if (uOne > 0.5) col = mix(c * lit, vec3(1.0, 0.85, 0.1), max(max(m1, m2), max(m3, m4)) * 0.95);   // composite plat: one colour
+      }
+      gl_FragColor = vec4(col, 1.0);
+      #include <colorspace_fragment>
+    }`;
+  const mkMat = skirt => new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: frag, side: THREE.DoubleSide,
+    uniforms: { uT, uYr, uEx, uPl, uBot: { value: BOT * VEX }, t57: { value: t57 }, t64: { value: t64 }, t71: { value: t71 }, uA, uB, t23: { value: t23 }, tPA: { value: tPA }, tPB: { value: tPB }, tG: { value: tG }, tR: { value: tR }, tL: { value: tL }, tLt: { value: tLt }, uLots, uCol, uSat, uOne, uL: { value: LIGHT }, uSkirt: { value: skirt ? 1 : 0 } } });
+
+  const tg = new THREE.BufferGeometry();
+  const pos = new Float32Array(N * N * 3), uv = new Float32Array(N * N * 2), h0 = new Float32Array(N * N), h1 = new Float32Array(N * N), top = new Float32Array(N * N).fill(1);
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+    const k = j * N + i;
+    pos[k * 3] = (i / (N - 1) - 0.5) * W_M; pos[k * 3 + 1] = 0; pos[k * 3 + 2] = (j / (N - 1) - 0.5) * H_M;
+    uv[k * 2] = (i / (N - 1) * 1799 + 0.5) / 1800; uv[k * 2 + 1] = 1 - (j / (N - 1) * 1799 + 0.5) / 1800;
+    h0[k] = Hs[0][k]; h1[k] = Hs[1][k];
+  }
+  const idx = new Uint32Array((N - 1) * (N - 1) * 6); let q = 0;
+  for (let j = 0; j < N - 1; j++) for (let i = 0; i < N - 1; i++) { const a = j * N + i, b = a + 1, c = a + N, d = c + 1; idx.set([a, c, b, b, c, d], q); q += 6; }
+  tg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); tg.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  tg.setAttribute('h0', new THREE.BufferAttribute(h0, 1)); tg.setAttribute('h1', new THREE.BufferAttribute(h1, 1)); tg.setAttribute('top', new THREE.BufferAttribute(top, 1));
+  tg.setAttribute('n0', new THREE.BufferAttribute(Ns[0], 3)); tg.setAttribute('n1', new THREE.BufferAttribute(Ns[1], 3));
+  tg.setIndex(new THREE.BufferAttribute(idx, 1)); tg.setAttribute('gy', new THREE.BufferAttribute(GY, 1)); tg.setAttribute('rd', new THREE.BufferAttribute(RD, 1)); tg.setAttribute('rq', new THREE.BufferAttribute(RQ, 1));
+  const terrain = new THREE.Mesh(tg, mkMat(false)); terrain.frustumCulled = false; world.add(terrain);
+
+  // base walls and bottom
+  { const P = [], U = [], A0 = [], A1 = [], T = [], NN = [], I = []; let v = 0;
+    const edge = (pts, nx, nz) => { for (let s = 0; s < pts.length; s++) { const [i, j] = pts[s], k = j * N + i, x = (i / (N - 1) - 0.5) * W_M, z = (j / (N - 1) - 0.5) * H_M;
+        for (const tp of [1, 0]) { P.push(x, 0, z); U.push(0, 0); A0.push(Hs[0][k]); A1.push(Hs[1][k]); T.push(tp); NN.push(nx, 0, nz); }
+        if (s) { const a = v - 2, b = v - 1, c = v, d = v + 1; I.push(a, b, c, c, b, d); } v += 2; } };
+    const r = [...Array(N).keys()];
+    edge(r.map(i => [i, 0]), 0, -1); edge(r.map(i => [i, N - 1]), 0, 1); edge(r.map(j => [0, j]), -1, 0); edge(r.map(j => [N - 1, j]), 1, 0);
+    for (const [x, z] of [[-.5, -.5], [.5, -.5], [-.5, .5], [.5, .5]]) { P.push(x * W_M, 0, z * H_M); U.push(0, 0); A0.push(0); A1.push(0); T.push(0); NN.push(0, -1, 0); }
+    I.push(v, v + 1, v + 2, v + 2, v + 1, v + 3);
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2));
+    g.setAttribute('h0', new THREE.Float32BufferAttribute(A0, 1)); g.setAttribute('h1', new THREE.Float32BufferAttribute(A1, 1)); g.setAttribute('top', new THREE.Float32BufferAttribute(T, 1));
+    g.setAttribute('n0', new THREE.Float32BufferAttribute(NN, 3)); g.setAttribute('n1', new THREE.Float32BufferAttribute(NN, 3)); g.setAttribute('gy', new THREE.Float32BufferAttribute(new Float32Array(P.length / 3), 1)); g.setAttribute('rd', new THREE.Float32BufferAttribute(new Float32Array(P.length / 3), 1)); g.setAttribute('rq', new THREE.Float32BufferAttribute(new Float32Array(P.length / 3).fill(-1), 1)); g.setIndex(I);
+    const skirt = new THREE.Mesh(g, mkMat(true)); skirt.frustumCulled = false; world.add(skirt); }
+
+  // ---------- trees ----------
+  stEl.textContent = 'trees and buildings';
+  const rnd = (() => { let q = 7; return () => (q = (q * 16807) % 2147483647) / 2147483647; })();
+  const wob = g => { const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i), f = 1 + 0.2 * Math.sin(x * 7.1 + z * 3.3 + y * 5.2) * Math.cos(z * 6.1 - x * 2.7); p.setXYZ(i, x * f, y, z * f); } g.computeVertexNormals(); return g; };
+  const broadG = wob(new THREE.IcosahedronGeometry(1, 1).translate(0, 1, 0)), coneG = new THREE.ConeGeometry(1, 2, 7).translate(0, 1, 0), trunkG = new THREE.CylinderGeometry(0.22, 0.32, 1, 5).translate(0, 0.5, 0);
+  const leafMat = new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true }), trunkMat = new THREE.MeshLambertMaterial({ color: 0x4a3a2a });
+  const makeTrees = (list, e) => {
+    const kind = list.map(t => rnd() < ((e === 0 ? t[4] : 1) ? 0.3 : 0.12) ? 1 : 0), nC = kind.reduce((a, b) => a + b, 0), nB = list.length - nC;
+    const mB = new THREE.InstancedMesh(broadG, leafMat, nB), mC = new THREE.InstancedMesh(coneG, leafMat, nC), mT = new THREE.InstancedMesh(trunkG, trunkMat, list.length);
+    const col = new THREE.Color(); let ib = 0, ic = 0; const slot = [];
+    list.forEach((t, k) => {
+      if (kind[k]) { col.setHSL(0.40 + (rnd() - .5) * .03, 0.38 + (rnd() - .5) * .1, 0.16 + rnd() * .06); mC.setColorAt(ic, col); slot.push(ic++); }
+      else { col.setHSL((e === 0 ? 0.24 : 0.27) + (rnd() - .5) * .05, 0.36 + (rnd() - .5) * .12, 0.20 + rnd() * .09); mB.setColorAt(ib, col); slot.push(ib++); }
+    });
+    for (const m of [mB, mC, mT]) { m.frustumCulled = false; world.add(m); }
+    return { mB, mC, mT, list, kind, slot, g: [list.map(t => hAt(0, t[0], t[1])), list.map(t => hAt(1, t[0], t[1]))], gv: list.map(t => gyAt(t[0], t[1])) };
+  };
+  const tr57 = makeTrees(scn.t57, 0), tr23 = makeTrees(scn.t23, 1);
+  const dummy = new THREE.Object3D();
+  const sstep = x => { x = Math.min(Math.max(x, 0), 1); return x * x * (3 - 2 * x); };
+  const wLocal = (g, yr, t) => g > 0.5 ? sstep((yr - (g - 1.0)) / 1.6) : t;   // same rule as the terrain shader
+  const placeTrees = (T, f, t, yr) => {
+    const { list, kind, slot, g, gv } = T, s = Math.max(f, 0.0001);
+    for (let k = 0; k < list.length; k++) {
+      const [px, py, h, r] = list[k], wl = wLocal(gv[k], yr, t), gy = g[0][k] * (1 - wl) + g[1][k] * wl, hv = h * VEX * s, x = wx(px), z = wz(py);
+      dummy.position.set(x, gy, z); dummy.scale.set(r * 0.28 * s, hv * 0.3, r * 0.28 * s); dummy.updateMatrix(); T.mT.setMatrixAt(k, dummy.matrix);
+      if (kind[k]) { dummy.position.set(x, gy + hv * 0.1, z); dummy.scale.set(r * 0.9 * s, hv * 0.45, r * 0.9 * s); dummy.updateMatrix(); T.mC.setMatrixAt(slot[k], dummy.matrix); }
+      else { dummy.position.set(x, gy + hv * 0.2, z); dummy.scale.set(r * 1.2 * s, hv * 0.4, r * 1.2 * s); dummy.updateMatrix(); T.mB.setMatrixAt(slot[k], dummy.matrix); }
+    }
+    for (const m of [T.mB, T.mC, T.mT]) { m.instanceMatrix.needsUpdate = true; m.visible = f > 0.003; }
+  };
+
+  // ---------- buildings: footprint walls, gable or hip roof on the footprint's long axis, chimney ----------
+  const SIDING = [0xe6e1d3, 0xe6e1d3, 0xd9d3c3, 0xcfc6b2, 0xb7b9bb, 0xa68d6f, 0x8c4b3c, 0x7d8d9c, 0xd2c7a8];
+  const hashN = n => { const v = Math.sin(n * 12.9898) * 43758.5453; return v - Math.floor(v); };
+  const obb = pts => {
+    let best = null;
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i], b = pts[(i + 1) % pts.length], ang = Math.atan2(b[1] - a[1], b[0] - a[0]), c = Math.cos(ang), s = Math.sin(ang);
+      let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
+      for (const p of pts) { const u = p[0] * c + p[1] * s, v = -p[0] * s + p[1] * c; x0 = Math.min(x0, u); x1 = Math.max(x1, u); z0 = Math.min(z0, v); z1 = Math.max(z1, v); }
+      const area = (x1 - x0) * (z1 - z0);
+      if (!best || area < best.area) best = { area, ang, c, s, x0, x1, z0, z1 };
+    }
+    const cu = (best.x0 + best.x1) / 2, cv = (best.z0 + best.z1) / 2; let L = best.x1 - best.x0, Wd = best.z1 - best.z0, ang = best.ang;
+    if (L < Wd) { [L, Wd] = [Wd, L]; ang += Math.PI / 2; }
+    return { cx: cu * best.c - cv * best.s, cz: cu * best.s + cv * best.c, ang, L, Wd };
+  };
+  const roofGeo = (a, b, y0, y1, hip) => {
+    const c = [[-a, y0, -b], [a, y0, -b], [a, y0, b], [-a, y0, b]], k = Math.max(a - b, 0.01);
+    const r0 = hip ? [-k, y1, 0] : [-a, y1, 0], r1 = hip ? [k, y1, 0] : [a, y1, 0], P = [];
+    const tri = (p, q, r) => P.push(...p, ...q, ...r);
+    tri(c[0], c[1], r1); tri(c[0], r1, r0); tri(c[2], c[3], r0); tri(c[2], r0, r1);
+    tri(c[3], c[0], r0); tri(c[1], c[2], r1);
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.computeVertexNormals(); return g;
+  };
+  const chimGeo = new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0), chimMat = new THREE.MeshLambertMaterial({ color: 0x8a5545 });
+  const makeBlds = (list, e) => list.map((b, n) => {
+    const pts = b.p.map(p => [wx(p[0]), wz(p[1])]), o = obb(pts), barn = e === 0 && o.L > 11;
+    const rise = Math.max(0.9, Math.min(o.Wd * (barn ? 0.42 : 0.3), b.h * 0.45)), eave = b.h - rise, rs = hashN(n + e * 50);
+    const wallCol = e === 0 ? (barn ? (rs < 0.5 ? 0x7a3b2e : 0x8a8578) : 0xe8e4d8) : SIDING[Math.floor(rs * SIDING.length)];
+    const shape = new THREE.Shape(pts.map(p => new THREE.Vector2(p[0], -p[1])));
+    const wg = new THREE.ExtrudeGeometry(shape, { depth: (eave + 3) * VEX, bevelEnabled: false }); wg.rotateX(-Math.PI / 2); wg.translate(0, -3 * VEX, 0);
+    const grp = new THREE.Group();
+    const walls = new THREE.Mesh(wg, new THREE.MeshLambertMaterial({ color: wallCol })); grp.add(walls);
+    const roofCol = new THREE.Color('#' + b.c); if (e === 1) roofCol.multiplyScalar(0.75);
+    const hip = !barn && rs > 0.45, ov = 0.5;
+    const roof = new THREE.Mesh(roofGeo(o.L / 2 + ov, o.Wd / 2 + ov, 0, rise * VEX, hip), new THREE.MeshLambertMaterial({ color: roofCol, side: THREE.DoubleSide }));
+    roof.position.set(o.cx, eave * VEX, o.cz); roof.rotation.y = -o.ang; grp.add(roof);
+    if (!barn && o.L > 9) { const ch = new THREE.Mesh(chimGeo, chimMat); const u = (rs - 0.5) * o.L * 0.5;
+      ch.scale.set(0.9, rise * VEX + 1.6 * VEX, 0.9); ch.position.set(o.cx + Math.cos(o.ang) * u, eave * VEX, o.cz + Math.sin(o.ang) * u); grp.add(ch); }
+    world.add(grp);
+    const gd = [0, 1].map(k => Math.min(...b.p.map(p => hAt(k, p[0], p[1]))));
+    let lab = null; if (e === 1 && b.y) { lab = document.createElement('div'); lab.innerHTML = '<span>' + b.y + '</span>' + (b.a ? '<small>' + b.a + '</small>' : ''); $('labels').appendChild(lab); }
+    return { lab, lx: o.cx, lz: o.cz, lh: b.h, mesh: grp, gd, y: b.y, gv: gyAt(b.p.reduce((a, p) => a + p[0], 0) / b.p.length, b.p.reduce((a, p) => a + p[1], 0) / b.p.length) };
+  });
+  const HERO = 37;   // the owner's farmhouse, built from photos instead of a generic footprint
+  const bl57 = makeBlds(scn.b57, 0), bl23 = makeBlds(scn.b23.filter((b, i) => i !== HERO && !(b.y > 1990)), 1);   // houses built after 1990 belong to the neighbouring development and are left out
+  const makeHero = part => {
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(part.p, 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(part.c.map(v => Math.pow(v, 2.2)), 3)); g.computeVertexNormals();
+    const mesh = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }));
+    const turn = new THREE.Group(); turn.rotation.y = house.rotY; turn.add(mesh);
+    const pivot = new THREE.Group(); pivot.position.set(house.pos[0], 0, house.pos[1]); pivot.add(turn); world.add(pivot);
+    const fp = scn.b23[HERO].p, gd = [0, 1].map(k => Math.min(...fp.map(p => hAt(k, p[0], p[1]))));
+    return { mesh: pivot, gd, gv: gyAt(fp.reduce((a, p) => a + p[0], 0) / fp.length, fp.reduce((a, p) => a + p[1], 0) / fp.length) };
+  };
+  bl23.push(makeHero(house.parts.today)); bl57.push(makeHero(house.parts.y1957));
+  const placeBlds = (L, f, t, yr) => { for (const B of L) { const { mesh, gd, y, gv } = B; const fv = y ? clamp01(yr - y + 1) : f, s = Math.max(fv, 0.0001), wl = wLocal(gv, yr, t); mesh.position.y = gd[0] * (1 - wl) + gd[1] * wl; mesh.scale.y = s; mesh.visible = fv > 0.003; B.on = fv > 0.6 && showBld.checked; } };
+
+  // ---------- vertical exaggeration: 1x is true scale ----------
+  const setEx = v => { v = Math.round(v * 10) / 10; world.scale.y = SCALE * v; uEx.value = v; $('vex').value = v; $('vexo').textContent = v === 1 ? '1× true' : v.toFixed(1) + '×'; };
+  $('vex').oninput = ev => setEx(+ev.target.value); setEx(1.5);
+
+  // ---------- timeline: 1957 -> plats recorded 1965 / 1967 / 1972 -> today ----------
+  // s is the slider position. The landscape stays 1957 until the last stretch (s 0.75 to 1), where terrain, trees and houses morph to today.
+  // Plat lines come in at their year and fade out as the morph finishes.
+  const STOPS = [{ l: '1957', s: 0 }, { l: '1961', s: 0.08, k: 1 }, { l: '1964', s: 0.15 }, { l: '1965', s: 0.21, k: 0 }, { l: '1967', s: 0.31, k: 3 }, { l: '1971', s: 0.36 }, { l: '1972', s: 0.41, k: 2 }, { l: '1980', s: 0.62 }, { l: '1990', s: 1 }];
+  // slider position -> calendar year; houses with a county year-built appear when the year reaches theirs (SDAT year built, matched by street address)
+  const YR = [[0, 1957], [0.08, 1961], [0.15, 1964], [0.21, 1965], [0.28, 1966], [0.31, 1967], [0.36, 1971], [0.41, 1972], [0.62, 1980], [0.8, 1987], [1, 1990]];
+  const yearAt = x => { for (let i = 1; i < YR.length; i++) if (x <= YR[i][0]) { const [a, ya] = YR[i - 1], [b, yb] = YR[i]; return ya + (yb - ya) * (x - a) / (b - a); } return 1990; };
+  const yrTimes = scn.b23.filter(b => b.y && b.y <= 1990).map(b => b.y);   // k = which plat layer appears at that stop (the 1967 Section 2 plan was never built, so it has no stop)
+  const LINE_CSS = ['#e68c1a', '#3390d9', '#f24733', '#b27af2'], LINE_NAME = ['1965 plat (Section 1, revised)', '1961 plat (Sweet Air Road lots)', '1972 plat (Section 3)', 'Section 2 portion, laid out with Section 1 (platted 1967, as drawn on the 1972 sheet)'];
+  let s = 0, target = 0, shownS = -1, t = 0;
+  const ss = x => x * x * (3 - 2 * x), clamp01 = x => Math.min(Math.max(x, 0), 1);
+  const showTrees = $('ctrees'), showBld = $('cbld'), showPlat = $('cplat'), allPlat = $('callp'), colOn = $('ccol'), lotsCb = $('clots');
+  const stopsEl = $('stops'), legend = $('legend');
+  STOPS.forEach((st, i) => { const b = document.createElement('button'); b.textContent = st.l; b.onclick = () => setStop(i); stopsEl.appendChild(b); st.el = b; });
+  const nearest = () => STOPS.reduce((bi, st, i) => Math.abs(st.s - s) < Math.abs(STOPS[bi].s - s) ? i : bi, 0);
+  let lastNear = -1;
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const fmtDate = y => { const yi = Math.floor(y + 1e-6), mi = Math.min(11, Math.floor((y - yi) * 12 + 1e-6)); return MON[mi] + ' ' + yi; };
+  const sOfYear = y => { for (let i = 1; i < YR.length; i++) if (y <= YR[i][1]) { const [a, ya] = YR[i - 1], [b, yb] = YR[i]; return a + (b - a) * (y - ya) / (yb - ya); } return 1; };
+  const posCss = f => 'calc(8px + (100% - 16px) * ' + f + ')';
+  { const tk = $('ticks'); for (let y = 1957; y <= 1990; y++) { const i = document.createElement('i'); const major = STOPS.some(st => st.l === String(y)); if (major) i.className = 'm'; i.style.left = posCss(sOfYear(y)); tk.appendChild(i);
+      if (major) { const b = document.createElement('b'); b.textContent = y; b.style.left = posCss(sOfYear(y)); tk.appendChild(b); } }
+    for (let mth = 0; mth < 12; mth++) { if (!mth) continue; const i = document.createElement('i'); i.style.left = posCss(sOfYear(1965 + mth / 12)); i.style.height = '2px'; tk.appendChild(i); } }
+  const refresh = () => {
+    t = ss(clamp01((s - 0.8) / 0.2));
+    uT.value = t; uA.value = ss(clamp01((s - 0.09) / 0.06)); uB.value = ss(clamp01((yearAt(s) - 1969.5) / 2.5));
+    const fade = 1 - ss(clamp01((s - 0.8) / 0.2)), on = showPlat.checked ? fade : 0;
+    const a = [0, 0, 0, 0]; for (const st of STOPS) if (st.k !== undefined) a[st.k] = ss(clamp01((s - (st.s - 0.07)) / 0.07)) * on;
+    const isToday = s > 0.97; allPlat.disabled = !isToday; allPlat.parentElement.style.opacity = isToday ? 1 : 0.4;
+    const one = isToday && allPlat.checked; uOne.value = one ? 1 : 0; if (one) a.fill(1);   // composite of every plat in a single colour, today only
+    uCol.value = colOn.checked ? 1 : 0; uLots.value = lotsCb.checked ? 1 : 0; uSat.value = ss(clamp01((yearAt(s) - 1975) / 14));
+    uPl.value.set(a[0], a[1], a[2], a[3]);
+    const f23 = ss(clamp01((t - 0.25) / 0.6)), f57 = ss(clamp01((0.75 - t) / 0.6));
+    const yr = yearAt(s); uYr.value = yr; $('dlab').textContent = fmtDate(yr); $('dlab').style.left = posCss(s); placeTrees(tr57, f57, t, yr); placeTrees(tr23, f23, t, yr); placeBlds(bl57, f57, t, yr); placeBlds(bl23, f23, t, yr);
+    $('yrnote').textContent = true ? fmtDate(yr) + ' · ' + yrTimes.filter(y => y <= yr).length + ' of ' + yrTimes.length + ' homes with a county year-built are standing · ground: ' + (s > 0.97 ? 'today’s aerial photo' : (uB.value > 0.5 ? '1971' : uA.value > 0.5 ? '1964' : '1957') + ' aerial photo') : '';
+    for (const T of [tr57, tr23]) for (const m of [T.mB, T.mC, T.mT]) m.visible &&= showTrees.checked;
+    for (const b of [...bl57, ...bl23]) b.mesh.visible &&= showBld.checked;
+    const n = nearest();
+    if (n !== lastNear) { lastNear = n; STOPS.forEach((st, i) => st.el.setAttribute('aria-pressed', i === n)); }
+    legend.innerHTML = one ? '<span><i style="background:#ffd91a"></i>All plats, composite (1961–1972)</span>' : [1, 0, 3, 2].filter(k => a[k] > 0.05).map(k => '<span><i style="background:' + LINE_CSS[k] + '"></i>' + LINE_NAME[k] + '</span>').join('');
+    if (lotsCb.checked) legend.innerHTML += '<span><i style="background:#3a8cff"></i>Lot 1, about 92 ac (1881): Eugene Pocock, with the farmhouse</span><span><i style="background:#ff9a2e"></i>Lot 2, about 60 ac: Salem Wesley Pocock</span>';
+    drawHud(); shownS = s;
+  };
+  const setStop = i => { target = STOPS[i].s; $('blend').value = target; };
+  $('blend').oninput = ev => { s = target = +ev.target.value; };
+  showTrees.onchange = showBld.onchange = showPlat.onchange = allPlat.onchange = colOn.onchange = lotsCb.onchange = () => { shownS = -1; };
+
+  // ---------- VR label ----------
+  const hudC = document.createElement('canvas'); hudC.width = 512; hudC.height = 128; const hx = hudC.getContext('2d');
+  const hudT = new THREE.CanvasTexture(hudC); hudT.colorSpace = THREE.SRGBColorSpace;
+  const hud = new THREE.Mesh(new THREE.PlaneGeometry(0.32, 0.08), new THREE.MeshBasicMaterial({ map: hudT, transparent: true }));
+  hud.position.set(0, TABLE_Y + 0.34, -0.55); hud.visible = false; scene.add(hud);
+  let lastLabel = '';
+  function drawHud() { const lab = STOPS[nearest()].l; if (lab === lastLabel) return; lastLabel = lab;
+    hx.clearRect(0, 0, 512, 128); hx.fillStyle = 'rgba(20,26,31,.85)'; hx.roundRect(0, 0, 512, 128, 28); hx.fill();
+    hx.fillStyle = '#e8e2d2'; hx.font = '600 64px Georgia, serif'; hx.textAlign = 'center'; hx.textBaseline = 'middle'; hx.fillText(lab, 256, 52);
+    hx.fillStyle = '#a29c8c'; hx.font = '24px sans-serif'; hx.fillText('trigger: next year  grip: scale  stick: spin', 256, 102); hudT.needsUpdate = true; }
+
+  // ---------- XR ----------
+  let inXR = false;
+  const setXRLook = ar => { room.visible = !ar; hud.visible = true; sky.visible = !ar; scene.fog = ar ? null : fog; renderer.setClearAlpha(ar ? 0 : 1); document.querySelectorAll('.ui').forEach(el => el.style.display = 'none'); controls.enabled = false; };
+  renderer.xr.addEventListener('sessionstart', () => { inXR = true; const s = renderer.xr.getSession(); setXRLook(s.environmentBlendMode && s.environmentBlendMode !== 'opaque'); });
+  renderer.xr.addEventListener('sessionend', () => { inXR = false; room.visible = false; hud.visible = false; sky.visible = true; scene.fog = fog; renderer.setClearAlpha(1); document.querySelectorAll('.ui').forEach(el => el.style.display = ''); statusBox.style.display = 'none'; controls.enabled = true; });
+  for (let k = 0; k < 2; k++) { const c = renderer.xr.getController(k); c.addEventListener('selectstart', () => setStop((nearest() + 1) % STOPS.length)); c.addEventListener('squeezestart', () => setEx(uEx.value > 1.05 ? 1 : 1.5)); scene.add(c); }
+  const startXR = async mode => {
+    try { const s = await navigator.xr.requestSession(mode, { optionalFeatures: ['local-floor', 'hand-tracking'] });
+      renderer.xr.setReferenceSpaceType('local-floor'); await renderer.xr.setSession(s); } catch (err) { $('note').textContent = 'Could not start the headset session: ' + err.message; }
+  };
+  if (navigator.xr) {
+    navigator.xr.isSessionSupported('immersive-vr').then(ok => { if (ok) { $('bvr').hidden = false; $('bvr').onclick = () => startXR('immersive-vr'); } }).catch(() => {});
+    navigator.xr.isSessionSupported('immersive-ar').then(ok => { if (ok) { $('bar').hidden = false; $('bar').onclick = () => startXR('immersive-ar'); } }).catch(() => {});
+  }
+
+  // ---------- loop ----------
+  const showDates = $('cdate'), labV = new THREE.Vector3(), D0 = camera.position.distanceTo(controls.target);
+  const updateLabels = () => {
+    const box = $('labels'), on = showDates.checked && !inXR; box.style.display = on ? 'block' : 'none'; if (!on) return;
+    const w = innerWidth, h = innerHeight;
+    for (const B of bl23) { const el = B.lab; if (!el) continue;
+      if (!B.on) { el.style.display = 'none'; continue; }
+      labV.set(B.lx, B.mesh.position.y + (B.lh + 1.5) * VEX * B.mesh.scale.y, B.lz); world.localToWorld(labV);
+      const d = camera.position.distanceTo(labV); labV.project(camera);
+      if (labV.z > 1 || Math.abs(labV.x) > 1.05 || Math.abs(labV.y) > 1.05) { el.style.display = 'none'; continue; }
+      el.style.display = 'block'; el.classList.toggle('near', d < D0 * 0.55);
+      el.style.transform = 'translate(' + ((labV.x * 0.5 + 0.5) * w) + 'px,' + ((-labV.y * 0.5 + 0.5) * h) + 'px) translate(-50%,-100%)'; } };
+
+  // ---------- Owner history tab (from the recorded deeds, 1860 - 2015) ----------
+  try {
+    const FY = (y, m, d) => y + (m - 1) / 12 + (d - 1) / 365;
+    const BARS = [   // lane, start, end, label, colour class, tooltip, open-ended-at-start
+      [0, FY(1851, 3, 4), FY(1860, 4, 3), 'Davis Powell', 'powell', 'Davis Powell: owner when the tract was surveyed (Mar 1851); sold to George W. Powell Apr 1860. His purchase date is not in these deeds.', 1],
+      [0, FY(1860, 4, 3), FY(1869, 6, 17), 'George W. Powell', 'powell', 'George Washington Powell, 1860 to 1869 (his mortgage was foreclosed)'],
+      [0, FY(1869, 6, 17), FY(1869, 11, 22), '', 'meakin', 'Samuel Meakin bought it at foreclosure auction 17 Jun 1869 (deed 14 Aug) and resold it 22 Nov 1869'],
+      [0, FY(1869, 11, 22), FY(1881, 9, 13), 'John Pocock', 'pocock', 'John Pocock, 1869 to 1881 (and Lot 2 until his death, before Nov 1884)'],
+      [0, FY(1946, 8, 7), FY(1959, 3, 30), 'Charles H. & Dorothy M. Cook', 'cook', 'Charles H. and Dorothy M. Cook, 1946 to 1959'],
+      [0, FY(1959, 3, 30), FY(1968, 9, 20), 'J. Thomas Requard & Co., Inc.', 'requard', 'J. Thomas Requard & Co., Inc., 1959 to 1968 (the developer of Sweet Air Manor)'],
+      [0, FY(1968, 9, 20), FY(1975, 6, 26), 'J. Thomas Requard', 'requard', 'J. Thomas Requard personally, 1968 to 1975 (what was left after the lots were sold)'],
+      [1, FY(1881, 9, 13), FY(1908, 4, 15), 'Eugene J. Pocock', 'pocock', 'Eugene J. Pocock, Lot 1 (about 92 acres), 1881 to 1908'],
+      [1, FY(1908, 4, 15), FY(1946, 8, 7), 'Henry Albright', 'albright', 'Henry Albright, Lot 1, 1908 until his death in 1945 (estate deed 1946)'],
+      [2, FY(1881, 9, 13), FY(1884, 11, 18), 'Pocock estate', 'pocock', 'John Pocock, then his executors, Lot 2 (about 60 acres)'],
+      [2, FY(1884, 11, 18), FY(1919, 9, 11), 'Salem Wesley Pocock', 'pocock', 'Salem Wesley Pocock, Lot 2, 1884 to 1919'],
+      [2, FY(1919, 9, 11), FY(1946, 8, 7), 'Henry Albright', 'albright', 'Henry Albright, Lot 2, 1919 until his death in 1945'],
+      [3, FY(1975, 6, 26), FY(1977, 8, 12), 'Lessa', 'lessa', 'Ronald Anthony Lessa and Victoria Stearns Lessa, 1975 to 1977'],
+      [3, FY(1977, 8, 12), FY(2014, 9, 29), 'Jean D. Crockett (37 years)', 'crockett', 'Jean D. Crockett, 1977 to 2014'],
+      [3, FY(2014, 9, 29), FY(2015, 8, 3), '', 'wright', 'Nathan R. and Lauren L. Wright, Sep 2014 to Aug 2015'],
+      [3, FY(2015, 8, 3), 2026.8, 'Kirkpatrick, 2015 to now', 'kirk', 'Jonathan P. and Kathryn C. Kirkpatrick, from 3 Aug 2015']
+    ];
+    const LANES = ['Whole farm (about 153 acres)', 'Lot 1 (about 92 acres)', 'Lot 2 (about 60 acres)', 'Farmhouse lot, 4305 Roundnoll Rd (Lot 3, Block C, Section 2): Lessa 1975–77 · Crockett 1977–2014 · Wright 2014–15 · Kirkpatrick 2015–now'];
+    const EVENTS = [
+      { d: 'Before 1860', y: 1851, t: 'Davis Powell', pre: 1, dl: [['Known from', 'a survey of "Davis Powell\'s land" by Joseph I. Dance, 4 March 1851, cited in the later deeds'], ['Notes', 'These deeds do not say when or from whom he acquired it. A private road across the tract (Powell\'s Private Road) is mentioned in every later description until 1968, when it is described as long abandoned.']], note: 'The records before 1860 are not in this folder, so the earlier chain of title is unknown.' },
+      { d: '3 April 1860 (recorded 4 June 1860)', y: 1860, t: 'Davis & Catharine Powell → George Washington Powell', dl: [['Property', '153 acres, 3 roods, 13 perches, subject to a right of way for Benjamin R. Powell over the road through the land'], ['Record', 'Liber G.H.C. 29, folio 379']] },
+      { d: '14 August 1869', y: 1869, t: 'Foreclosure: Walter G. Smith, attorney, & Robert R. Boarman, trustee → Samuel Meakin', dl: [['What happened', 'George W. and Caroline A. Powell had mortgaged the farm (9 Nov 1867) to Erastus Milton. After a default it was sold at public auction at the Towson courthouse door on 17 June 1869.'], ['Buyer', 'Samuel Meakin, the high bidder'], ['Record', 'Liber E.H.A. 63, folio 343']], note: 'The same tract: 153 acres, 3 roods, 13 perches.' },
+      { d: '22 November 1869', y: 1869, t: 'Samuel & Mary A. Meakin → John Pocock', dl: [['Property', 'the whole 153-acre tract, with its improvements'], ['Record', 'Liber E.H.A. 64, folio 271']], note: 'Meakin held the farm for only five months. The Pocock family then kept it for the next fifty years.' },
+      { d: '13 September 1881 (recorded 28 Dec 1881)', y: 1881, t: 'John & Mary Pocock → Eugene Pocock', dl: [['Property', 'Lot No. 1 of the division laid out by Calvin Harlan (later described as about 92 acres)'], ['Record', 'Liber W.M.I. 127, folio 174']], note: 'The farm was split into two lots here. John Pocock kept Lot 2. The farmhouse and barns appear to stand on Lot 1, so this is probably when the house passed to Eugene (see “Which lot was the farmhouse on?” above).' },
+      { d: '18 November 1884 (recorded 5 Dec 1884)', y: 1884, t: 'Mary Pocock & Jesse Pocock, executors of John Pocock (deceased) → Salem Wesley Pocock', dl: [['Property', 'Lot No. 2 on Calvin Harlan\'s plat (about 60 acres)'], ['Record', 'Liber W.M.I. 143, folio 146']], note: 'This is the western strip of the farm, without the farmhouse. John Pocock died between September 1881 and November 1884. The 1919 deed adds that his will "was not legally drawn to pass real estate", so all his heirs joined in this deed.' },
+      { d: '15 April 1908', y: 1908, t: 'Eugene J. & Sarah E. Pocock → Henry Albright', dl: [['Property', 'Lot 1, 92 acres, 1 rood, 37 perches'], ['Record', 'Liber W.P.C. 327, folio 133']], note: 'Probably the sale of the farmhouse lot: the Albrights owned the house from here on.' },
+      { d: '11 September 1919', y: 1919, t: 'Salem Wesley Pocock (a bachelor) → Henry Albright', dl: [['Property', 'Lot 2, about 60 acres, 1 rood, 19 square perches'], ['Record', 'Liber W.P.C. 516, folio 14']], note: 'With this deed Henry Albright owned both lots again, about 153 acres in all, for the first time since 1881.' },
+      { d: '7 August 1946', y: 1946, t: 'Clarence W. Albright, administrator of the estate of Henry Albright → Charles H. & Dorothy M. Cook', dl: [['Background', 'Henry Albright died without a will on 26 May 1945. In March 1945 he had contracted to sell to the Cooks, who paid the last part of the price to the estate, which the Orphans\' Court allowed it to accept.'], ['Property', 'the two parcels (92 + 60 acres), as tenants by the entireties'], ['Record', 'Liber R.J.S. 1489, folios 128-130']], note: 'A June 2014 Baltimore Fishbowl article on the house tells of a WWII soldier who learned by letter that his mother had bought the farm, and of a woman born in the house who remembered it as a dairy farm. The article does not name the family. The Cooks signed their contract in March 1945, during the war, so this may be them.' },
+      { d: '30 March 1959', y: 1959, t: 'Charles H. & Dorothy M. Cook → J. Thomas Requard & Co., Inc.', dl: [['Property', 'the whole farm, restated as a single description of 153 acres'], ['Record', 'Liber W.J.R. 3507, folio 587']], note: 'The developer takes the farm. Powell\'s Private Road is described as "long since abandoned".', jump: 1 },
+      { d: '20 September 1968', y: 1968, t: 'J. Thomas Requard & Co., Inc. → J. Thomas Requard', dl: [['What happened', 'The company filed Articles of Dissolution (19 Sept 1968, approved 20 Sept), and Requard, its sole stockholder, received its remaining land.'], ['Property', 'the 153-acre tract, "saving and excepting" every part already sold, meaning the Sweet Air Manor lots'], ['Record', 'Liber O.T.G. 4923, folio 408']], note: 'The Sweet Air Manor plats in the model (1961 to 1972) were laid out between these two deeds.', jump: 1 },
+      { d: '26 June 1975', y: 1975, t: 'J. Thomas Requard → Ronald Anthony Lessa & Victoria Stearns Lessa', dl: [['Property', 'Lot 3, Block C, Plat of Section 2, Sweet Air Manor (Plat Book O.T.G. 32, folio 91): the farmhouse lot, 4305 Roundnoll Road'], ['Record', 'Liber E.H.K. 5543, folio 447']], note: 'This is where the chain of title for the farmhouse alone starts.', jump: 1 },
+      { d: '12 August 1977', y: 1977, t: 'Ronald Anthony & Victoria Stearns Lessa → Jean D. Crockett', dl: [['Property', 'Lot 3, Block C, Section 2, Sweet Air Manor, 4305 Roundnoll Road'], ['Record', 'Liber E.H.K. 5800, folio 444']], note: 'Jean D. Crockett owned the house for 37 years, the longest of any owner of the farmhouse lot.', jump: 1 },
+      { d: '29 September 2014', y: 2014, t: 'Jean D. Crockett → Nathan R. & Lauren L. Wright', dl: [['Property', '4305 Roundnoll Road'], ['Record', 'Liber J.L.E. 35432, folio 146']] },
+      { d: '3 August 2015', y: 2015, t: 'Nathan R. & Lauren L. Wright → Jonathan P. & Kathryn C. Kirkpatrick', dl: [['Property', '4305 Roundnoll Road'], ['Record', 'Liber J.L.E. 36541, folio 54']] }
+    ];
+const OWNER_MOUNT=(()=>{
+const FY=(y,m,d)=>y+(m-1)/12+(d-1)/365;
+const NOW=FY(2026,11,2);
+const COL={powell:'#d8ad6e',meakin:'#b5a98f',pocock:'#8fbf9c',albright:'#86a9d0',cook:'#c9a0c4',requard:'#e58b66',lessa:'#b9d98f',crockett:'#9fcf7f',wright:'#d6d38a',kirk:'#f0cf7a'};
+const LANE_NAME={whole:'Whole farm',lot1:'Lot 1',lot2:'Lot 2',house:'Farmhouse lot'};
+// s,e = deed dates; house = the 4305 Roundknoll Rd farmhouse stood on this parcel (Lot 1 probable)
+const P=[
+ {name:'Davis Powell',short:'Powell',lane:'whole',s:FY(1851,3,4),e:FY(1860,4,3),k:'powell',house:1,open:1,how:'earlier chain not in the deeds'},
+ {name:'George W. Powell',lane:'whole',s:FY(1860,4,3),e:FY(1869,6,17),k:'powell',house:1,how:'deed 1860 (family transfer); lost to foreclosure 1869'},
+ {name:'Samuel Meakin',lane:'whole',s:FY(1869,6,17),e:FY(1869,11,22),k:'meakin',house:1,how:'foreclosure auction'},
+ {name:'John Pocock',lane:'whole',s:FY(1869,11,22),e:FY(1881,9,13),k:'pocock',house:1,how:'bought the whole farm'},
+ {name:'Eugene J. Pocock',lane:'lot1',s:FY(1881,9,13),e:FY(1908,4,15),k:'pocock',house:1,how:'Lot 1, family transfer'},
+ {name:'Henry Albright',lane:'lot1',s:FY(1908,4,15),e:FY(1919,9,11),k:'albright',house:1,how:'Lot 1, bought from Eugene Pocock'},
+ {name:'John Pocock, then his estate',short:'John Pocock / estate',lane:'lot2',s:FY(1881,9,13),e:FY(1884,11,18),k:'pocock',how:'kept Lot 2; died before Nov 1884'},
+ {name:'Salem Wesley Pocock',lane:'lot2',s:FY(1884,11,18),e:FY(1919,9,11),k:'pocock',how:'Lot 2, from the executors'},
+ {name:'Henry Albright (both lots)',short:'Henry Albright',lane:'whole',s:FY(1919,9,11),e:FY(1946,8,7),k:'albright',house:1,how:'bought Lot 2 from Salem Wesley Pocock'},
+ {name:'Charles H. & Dorothy M. Cook',lane:'whole',s:FY(1946,8,7),e:FY(1959,3,30),k:'cook',house:1,how:'from Albright’s estate'},
+ {name:'J. Thomas Requard & Co., Inc.',lane:'whole',s:FY(1959,3,30),e:FY(1968,9,20),k:'requard',house:1,how:'the developer of Sweet Air Manor'},
+ {name:'J. Thomas Requard',lane:'whole',s:FY(1968,9,20),e:FY(1975,6,26),k:'requard',house:1,how:'company dissolved; remaining land'},
+ {name:'Ronald & Victoria Lessa',lane:'house',s:FY(1975,6,26),e:FY(1977,8,12),k:'lessa',house:1,how:'farmhouse lot, Lot 3 Block C'},
+ {name:'Jean D. Crockett',lane:'house',s:FY(1977,8,12),e:FY(2014,9,29),k:'crockett',house:1,how:'owned it 37 years'},
+ {name:'Nathan & Lauren Wright',lane:'house',s:FY(2014,9,29),e:FY(2015,8,3),k:'wright',house:1,how:'sold to the Kirkpatricks in 2015'},
+ {name:'Jonathan & Kathryn Kirkpatrick',lane:'house',s:FY(2015,8,3),e:NOW,k:'kirk',house:1,how:'current owners'}
+];
+const SPLIT=FY(1881,9,13), MERGE=FY(1919,9,11), FORK=FY(1975,6,26);
+const mon=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const ylab=y=>mon[Math.min(11,Math.floor((y-Math.floor(y))*12+1e-6))]+' '+Math.floor(y+1e-6);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const held=p=>{const d=p.e-p.s,m=Math.round(d*12);let t=d>=1.95?Math.round(d)+' years':d>=0.95?(m>=23?'2 years':'1 year'):(m<=1?'1 month':m+' months');if(d>=1&&d<1.95)t='1 year';return (p.open?'at least ':'')+t+(p.e>=NOW-0.5?' so far':'')};
+const dates=p=>(p.open?'?':Math.floor(p.s))+'–'+(p.e>=NOW-0.5?'now':Math.floor(p.e));
+const cv=document.createElement('canvas').getContext('2d');
+const tw=(t,px=13,w=600)=>{cv.font=w+' '+px+'px "IBM Plex Sans",system-ui,sans-serif';return cv.measureText(t).width};
+const ownersAt=y=>{ // lanes alive at year y
+  const out=[]; for(const p of P) if(y>=p.s&&y<p.e) out.push(p); return out;};
+function tipHTML(y){
+  const o=ownersAt(y); let h='<div class="y">'+ylab(y)+'</div>';
+  if(y<P[0].s) return h+'<div class="r"><span>Before the oldest deed in the folder</span></div>';
+  if(y>=NOW) return h;
+  for(const p of o){ h+='<div class="r"><span>'+LANE_NAME[p.lane]+':</span> '+esc(p.name)+'</div>'; }
+  const hp=o.find(p=>p.house); if(hp) h+='<div class="r hh">⌂ farmhouse: '+esc(hp.name)+(hp.lane==='lot1'?' (Lot 1)':'')+'</div>';
+  for(const p of o) h+='<div class="r"><span>'+esc(p.name)+' held it '+held(p)+'</span></div>';
+  return h;
+}
+// hover helper: box element, yearAt(clientX,clientY)->year, orient 'v' (vertical line) or 'h'
+function hover(box,yearAt,orient){
+  const inn=box.querySelector('.in'); const hl=document.createElement('div'); hl.className='hl'; const tip=document.createElement('div'); tip.className='tip'; inn.appendChild(hl); inn.appendChild(tip);
+  if(orient==='h'){hl.style.cssText+=';top:0;bottom:auto;left:0;right:0;width:auto;height:0;border-left:0;border-top:1.5px dashed #fff'}
+  inn.addEventListener('mousemove',e=>{
+    const r=inn.getBoundingClientRect(); const y=yearAt(e.clientX,e.clientY,r); if(y==null){hl.style.display=tip.style.display='none';return}
+    hl.style.display=tip.style.display='block';
+    if(orient==='h') hl.style.top=(e.clientY-r.top)+'px'; else hl.style.left=(e.clientX-r.left)+'px';
+    tip.innerHTML=tipHTML(y); const tx=e.clientX-r.left, w=tip.offsetWidth; let l=tx+16; if(l+w>r.width-4) l=tx-w-16; tip.style.left=Math.max(4,l)+'px'; tip.style.top=Math.max(4,(e.clientY-r.top)-14)+'px';
+  });
+  inn.addEventListener('mouseleave',()=>{hl.style.display=tip.style.display='none'});
+}
+const svgNS='http://www.w3.org/2000/svg';
+const S=(h)=>h;  // marker for readability
+function gold(x,y,w,h,r=7){return `<rect x="${x-2}" y="${y-2}" width="${w+4}" height="${h+4}" rx="${r+2}" fill="none" stroke="#ffd23f" stroke-width="2.5"/>`}
+
+/* ---------- label placement shared by the SVG designs ---------- */
+const EVMAP=[0,1,2,3,4,6,4,5,7,8,9,10,11,12,13,14];
+function mount(root,EV,scroller){
+const FH=p=>p.lane==='lot1'||p.lane==='house';
+const BUILT_NOTE='Built in 1902, according to the family. This year is not in the deeds. It falls during Eugene J. Pocock\u2019s ownership of Lot 1 (1881 to 1908), so the house passed to Henry Albright with that lot in 1908. A June 2014 Baltimore Fishbowl \u201cHouse of the Day\u201d article on the house also gives 1902, probably from the same source.';
+// which periods each deed starts
+const ownersOf=k=>{const out=[];EVMAP.forEach((e,i)=>{if(e===k)out.push(i)});return out};
+const Y0=1845,Y1=2030,W=480,H=800,TOP=34,BOT=14,PXY=(H-TOP-BOT)/(Y1-Y0),BW=38,CX={lot1:262,whole:314,house:314,lot2:366},LX=226,RX=394;
+const yy=t=>TOP+(t-Y0)*PXY;
+const cvs=document.createElement('canvas').getContext('2d');
+const meas=(t,px,w)=>{cvs.font=w+' '+px+'px "IBM Plex Sans",system-ui,sans-serif';return cvs.measureText(t).width};
+function wrap(t,maxW,px,w){const words=t.split(' ');const out=[];let cur='';for(const wd of words){const tr=cur?cur+' '+wd:wd;if(meas(tr,px,w)<=maxW||!cur)cur=tr;else{out.push(cur);cur=wd}}if(cur)out.push(cur);return out}
+let s='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMin meet" id="sv"><g id="ld"></g>';
+s+='<text x="'+CX.lot1+'" y="18" font-size="11.5" font-weight="700" text-anchor="middle" fill="#ffd23f">⌂ Lot 1</text><text x="'+CX.whole+'" y="18" font-size="11.5" font-weight="700" text-anchor="middle" fill="#b9b3a3">Whole farm</text><text x="'+CX.lot2+'" y="18" font-size="11.5" font-weight="700" text-anchor="middle" fill="#b9b3a3">Lot 2</text>';
+for(let t=1850;t<=2025;t+=25)s+='<line x1="4" x2="'+(W-4)+'" y1="'+yy(t)+'" y2="'+yy(t)+'" stroke="rgba(255,255,255,.09)"/><text x="4" y="'+(yy(t)-3)+'" font-size="10.5" fill="#b9b3a3">'+t+'</text>';
+s+='<path d="M'+(CX.lot1+BW/2)+','+yy(SPLIT)+' L'+(CX.whole-BW/2)+','+yy(SPLIT)+' M'+(CX.whole+BW/2)+','+yy(SPLIT)+' L'+(CX.lot2-BW/2)+','+yy(SPLIT)+' M'+(CX.lot1+BW/2)+','+yy(MERGE)+' L'+(CX.whole-BW/2)+','+yy(MERGE)+' M'+(CX.whole+BW/2)+','+yy(MERGE)+' L'+(CX.lot2-BW/2)+','+yy(MERGE)+'" stroke="#8f98a1" stroke-width="2.5"/>';
+
+
+P.forEach((p,i)=>{const x0=CX[p.lane]-BW/2,y0=yy(p.s),h=Math.max(yy(p.e)-y0,2.5),g=FH(p);
+ s+='<rect class="ob" data-i="'+i+'" x="'+x0+'" y="'+y0+'" width="'+BW+'" height="'+h+'" rx="4" fill="'+COL[p.k]+'" stroke="'+(p.open?'#fff':g?'#ffd23f':'rgba(0,0,0,.35)')+'" stroke-width="'+(g?2:1)+'" stroke-dasharray="'+(p.open?'4 3':'')+'" style="cursor:pointer"></rect>'});
+const hy=yy(FY(1902,6,1));
+s+='<g id="hm" style="cursor:pointer"><line x1="'+(CX.lot1+10)+'" x2="'+(CX.whole-8)+'" y1="'+hy+'" y2="'+hy+'" stroke="#ffd23f" stroke-width="1.5"/><circle cx="'+CX.lot1+'" cy="'+hy+'" r="10" fill="#ffd23f" stroke="#14181c" stroke-width="2"/><text x="'+CX.lot1+'" y="'+(hy+4.5)+'" font-size="13" font-weight="700" text-anchor="middle" fill="#14181c">\u2302</text><text x="'+(CX.whole+2)+'" y="'+(hy-3)+'" font-size="10.5" font-weight="700" text-anchor="middle" fill="#ffd23f">built</text><text x="'+(CX.whole+2)+'" y="'+(hy+9)+'" font-size="10.5" font-weight="700" text-anchor="middle" fill="#ffd23f">1902</text></g>';
+// labels with leaders
+const L=P.map((p,i)=>{const side=p.lane==='lot2'?'R':'L',maxW=(side==='L'?LX-6:W-RX-4);
+ const nameL=wrap((p.house&&FH(p)?'⌂ ':'')+p.name,maxW,12,700);const d=dates(p);const how=d+' · '+p.how;const sub=[meas(how,10.5,500)<=maxW?how:d+(p.lane==='lot1'?' · Lot 1':p.lane==='lot2'?' · Lot 2':'')];
+ const lines=nameL.length+sub.length+1;return {i,p,side,nameL,sub,h:lines*13+3,mid:(yy(p.s)+Math.max(yy(p.e),yy(p.s)+2.5))/2}});
+for(const side of ['L','R']){const A=L.filter(l=>l.side===side).sort((a,b)=>a.mid-b.mid);let last=TOP-6;for(const l of A){l.top=Math.max(l.mid-l.h/2,last+4);last=l.top+l.h}
+ let lim=H-4;for(let k=A.length-1;k>=0;k--){const l=A[k];if(l.top+l.h>lim)l.top=lim-l.h;lim=l.top-4}let f=TOP-8;for(const l of A){if(l.top<f)l.top=f;f=l.top+l.h+4}}
+let ld='';
+for(const l of L){const p=l.p,x0=CX[p.lane],left=l.side==='L',tx=left?LX:RX,an=left?'end':'start';
+ const xb=left?x0-BW/2:x0+BW/2,yc=l.top+8;
+ ld+='<path d="M'+xb+','+l.mid+' L'+(left?tx+6:tx-6)+','+l.mid+' L'+(left?tx+2:tx-2)+','+yc+'" fill="none" stroke="#b9b3a3" stroke-width="1" opacity=".8"/>';
+ let y=l.top+10,t='<g class="lab" data-i="'+l.i+'">';
+ for(const ln of l.nameL){t+='<text x="'+tx+'" y="'+y+'" font-size="12" font-weight="700" text-anchor="'+an+'" fill="#fff">'+esc(ln)+'</text>';y+=13}
+ for(const ln of l.sub){t+='<text x="'+tx+'" y="'+y+'" font-size="10.5" text-anchor="'+an+'" fill="#b9b3a3">'+esc(ln)+'</text>';y+=13}
+ t+='<text x="'+tx+'" y="'+y+'" font-size="11" font-weight="700" text-anchor="'+an+'" fill="#ffd23f">'+held(p)+'</text></g>';l.svg=t}
+s=s.replace('<g id="ld"></g>','<g id="ld">'+ld+'</g>');
+s+=L.map(l=>l.svg).join('');
+s+='<g id="mk" style="display:none;pointer-events:none"><line x1="4" x2="'+(W-4)+'" y1="0" y2="0" stroke="#fff" stroke-width="1.5" stroke-dasharray="5 3"/><rect x="'+(W-92)+'" y="-9" width="86" height="18" rx="9" fill="#0d1013" stroke="rgba(255,255,255,.5)"/><text id="mkt" x="'+(W-49)+'" y="4" font-size="11" font-weight="700" text-anchor="middle" fill="#e8c26b"></text></g></svg>';
+root.querySelector('#ch').innerHTML=s;
+const ch=root.querySelector('#ch'),sv=root.querySelector('#sv'),mk=root.querySelector('#mk');
+// cards
+const cards=root.querySelector('#cards');let html='';const order=[];
+EV.forEach((e,k)=>{
+ if(k===6){html+='<div class="oc built" data-k="b"><div class="d">1902 <em>\u2302 farmhouse lot</em></div><div class="t">\u2302 The farmhouse is built</div><div class="nt">'+esc(BUILT_NOTE)+'</div></div>'}
+ const ow=ownersOf(k);const fh=ow.some(i=>FH(P[i]));
+ html+='<div class="oc" data-k="'+k+'"><div class="d">'+esc(e.d)+(fh?'<em>⌂ farmhouse lot</em>':'')+'</div><div class="t">'+esc(e.t)+'</div>'+e.dl.map(r=>'<div class="row"><span>'+esc(r[0])+'</span><span>'+esc(r[1])+'</span></div>').join('')+(e.note?'<div class="nt">'+esc(e.note)+'</div>':'')+(e.jump?'<button class="jb" data-y="'+e.y+'">See the model in '+e.y+'</button>':'')+'</div>';order.push(k)});
+cards.innerHTML=html;
+// highlight
+let cur=null,pinned=null,hovering=false;
+const hm=root.querySelector('#hm');
+function show(k){if(k===cur)return;cur=k;const bars=[...sv.querySelectorAll('.ob')],labs=[...sv.querySelectorAll('.lab')];
+ if(k==null){bars.forEach(b=>b.classList.remove('on'));labs.forEach(g=>g.classList.remove('on'));sv.classList.remove('dim');hm.classList.remove('on');mk.style.display='none';cards.querySelectorAll('.oc').forEach(c=>c.classList.remove('hot'));return}
+ let ow,yv;
+ if(k==='b'){ow=[4];yv=FY(1902,6,1);hm.classList.add('on')}else{ow=ownersOf(+k);yv=P[ow[0]].s;hm.classList.remove('on')}
+ bars.forEach(b=>b.classList.toggle('on',ow.includes(+b.dataset.i)));labs.forEach(g=>g.classList.toggle('on',ow.includes(+g.dataset.i)));sv.classList.add('dim');
+ mk.style.display='block';mk.setAttribute('transform','translate(0,'+yy(yv)+')');root.querySelector('#mkt').textContent=k==='b'?'Built 1902':ylab(yv);
+ cards.querySelectorAll('.oc').forEach(c=>c.classList.toggle('hot',c.dataset.k===String(k)))}
+const kOf=c=>c.dataset.k==='b'?'b':+c.dataset.k;
+cards.addEventListener('mouseover',e=>{const c=e.target.closest('.oc');if(c){hovering=true;show(kOf(c))}});
+cards.addEventListener('mouseleave',()=>{hovering=false;if(pinned!=null)show(pinned);else spy()});
+function spy(){if(hovering||pinned!=null)return;let best=null,bd=1e9;const mid=innerHeight*0.38;cards.querySelectorAll('.oc').forEach(c=>{const r=c.getBoundingClientRect();const d=Math.abs(r.top+Math.min(r.height,160)/2-mid);if(d<bd){bd=d;best=c}});if(best)show(kOf(best))}
+scroller.addEventListener('scroll',spy,{passive:true});addEventListener('resize',spy);
+['wheel','touchmove','keydown'].forEach(ev=>scroller.addEventListener(ev,()=>{if(pinned!=null){pinned=null;if(!hovering)spy()}},{passive:true}));
+sv.addEventListener('click',e=>{const t=e.target.closest('.ob,.lab,#hm');if(!t)return;const k=t.id==='hm'?'b':EVMAP[+t.dataset.i];const c=cards.querySelector('.oc[data-k="'+k+'"]');if(!c)return;pinned=k;cur=undefined;show(k);c.scrollIntoView({behavior:'smooth',block:'center'})});
+show(null);spy();
+
+}
+return mount;})();
+
+    const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+    const X0 = 1850, X1 = 2030, pc = y => ((y - X0) / (X1 - X0) * 100).toFixed(3) + '%';
+    let h = '<div class="stk" id="stk"><h2>Who owned the farm</h2><p class="hint">Read from the recorded deeds, 1860 to 2015. Hover a deed to light up its owner on the timeline. Click any block or name to select it and centre its deed.</p></div>';
+    h += '<div class="olayout" id="olay"><aside class="oside"><div class="ochart" id="ch"></div></aside><div class="ocards" id="cards"></div></div>';
+    h += '<p style="margin-top:14px;font-size:12.5px">Dates are the dates written in each deed. Handwriting is old and sometimes faint, so a few figures are approximate. Gold outline and ⌂ mark the lot that held the 4305 Roundnoll Rd farmhouse (probably Lot 1). The 1902 build year comes from the family, not the deeds.</p>';
+    h += '<h3>Which lot was the farmhouse on?</h3><p>The deeds never say, but the 1881 and 1884 deeds give the exact bearings and distances of the two lots. Drawn out, and fitted to the 1957 aerial, they follow the field edges and tree lines, run along Sweet Air Road, and come to about 92 and 58 acres (the deeds say 92 and 60). The line between the lots follows “Powell\'s Private Road”, which looks like the old farm lane, and the farmhouse and barns sit east of it, on <b style="color:#fff">Lot 1</b>, about 35 m inside the line. My fit could be off by about that much, so treat it as probable rather than proven.</p><img src="farm_lots_1957.jpg" alt="The two 1881 lots drawn over the 1957 aerial photograph" style="width:100%;max-width:760px;border-radius:12px;border:1px solid var(--line);display:block"><p><button id="showlots" class="btn" style="margin-top:10px">Show the lots on the model</button></p>';
+    h += '<p style="margin-top:18px;font-size:12.5px">Not in these deeds: how long anyone lived in the farmhouse. The county records used for the house dates on the model (SDAT) hold no owner names.</p>';
+    $('ownwrap').innerHTML = h;
+    OWNER_MOUNT($('olay'), EVENTS, $('own'));
+    const ownVars = () => { const hb = Math.ceil($('head').getBoundingClientRect().bottom) + 8; $('own').style.setProperty('--ownTop', hb + 'px'); $('own').style.setProperty('--ownStick', (hb - parseFloat(getComputedStyle($('own')).paddingTop)) + 'px'); $('own').style.setProperty('--stkh', $('stk').offsetHeight + 'px'); };
+    addEventListener('resize', ownVars); ownVars();
+    const showOwn = on => { $('own').hidden = !on; document.body.classList.toggle('own', on); $('tabown').setAttribute('aria-pressed', on); $('tab3d').setAttribute('aria-pressed', !on); if (on) { $('own').scrollTop = 0; ownVars(); } };
+    $('ownwrap').addEventListener('click', ev => { if (ev.target.id === 'showlots') { showOwn(false); lotsCb.checked = true; s = target = 0; $('blend').value = 0; shownS = -1; } });
+    $('tab3d').onclick = () => showOwn(false); $('tabown').onclick = () => showOwn(true);
+    $('ownwrap').addEventListener('click', ev => { const b = ev.target.closest('button[data-y]'); if (!b) return; showOwn(false); s = target = sOfYear(Math.max(1957, +b.dataset.y) + 0.5); $('blend').value = s; });
+  } catch (e) { console.error('owner tab', e); }
+  const resize = () => { const w = innerWidth, h = innerHeight; if (!inXR) { renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); } };
+  addEventListener('resize', resize); resize();
+  refresh(); statusBox.style.display = 'none';
+  let last = performance.now();
+  renderer.setAnimationLoop(() => {
+    const now = performance.now(), dt = Math.min((now - last) / 1000, 0.1); last = now;
+    if (Math.abs(target - s) > 0.0005) { s += (target - s) * Math.min(1, dt * 2.6); if (Math.abs(target - s) <= 0.0005) s = target; $('blend').value = s; }
+    if (s !== shownS) refresh();
+    if (inXR) { const s = renderer.xr.getSession(); for (const src of s.inputSources) { const a = src.gamepad && src.gamepad.axes; if (a && a.length >= 4 && Math.abs(a[2]) > 0.15) rig.rotation.y += a[2] * dt * 1.2; } }
+    else controls.update();
+    updateLabels();
+    renderer.render(scene, camera);
+  });
+} catch (err) {
+  statusBox.innerHTML = '<b>The model could not start</b>' + String(err && err.message || err);
+  console.error(err);
+}
+</script>
