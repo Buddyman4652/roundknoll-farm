@@ -139,7 +139,7 @@ body.own #foot,body.own #labels,body.own #layers,body.own #head .sub{display:non
   <div id="lbody">
     <div class="grp">Plats</div>
     <label><input id="cplat" type="checkbox" checked> Plat lines</label>
-    <label title="The recorded plat sheets, warped to fit the map"><input id="cpr" type="checkbox"> Original plat prints</label>
+    <label title="The recorded plat sheets, warped to fit the map (Sections 1 to 3 together)"><input id="cpr" type="checkbox"> Original plat prints</label>
     <label title="Available at the final (1990) stop"><input id="callp" type="checkbox" disabled> All plats over today</label>
     <label><input id="clots" type="checkbox"> 1881 farm lots</label>
     <div class="grp">Ground</div>
@@ -171,7 +171,7 @@ body.own #foot,body.own #labels,body.own #layers,body.own #head .sub{display:non
   <h3>How the model is built</h3>
   <p>The timeline steps through the recorded subdivision plats, drawn over the 1957 landscape. From 1961 on, today’s houses appear in the year the county records say they were built (Maryland SDAT year built, matched by street address; a few outbuildings take their house’s year). The Section 1 and Section 2 plat lines share one colour.</p>
   <p>The ground photo fades from the 1957 aerial to the 1964 and then the 1971 aerials (each covers the middle of the map; the edges keep the older photo). The terrain changes patch by patch: each lot switches from the 1957 surface to today’s lidar in the year before its house was built, and the roads are cut in the year after their plat was approved (1962, 1966, 1968, 1973), ahead of the houses. The 2023 aerial replaces the older photos on the regraded patches after 1972, starting in black and white to match the older prints.</p>
-  <p><b>Layers.</b> “Colourise photos” gives the old photos an estimated colour borrowed from today’s aerial (interpretive, not original). “All plats over today” draws every plat at once over the current ground. “Original plat prints” drapes the recorded plat sheets over the ground, each warped to fit the map. “Raw lidar” is a hillshade of the Baltimore County lidar surface, trees and roofs included. “Topographic contours” are drawn from the same lidar every 5 ft (heavier every 25 ft), and show the 1957 ground’s contours before it was regraded.</p>
+  <p><b>Layers.</b> “Colourise photos” gives the old photos an estimated colour borrowed from today’s aerial (interpretive, not original). “All plats over today” draws every plat at once over the current ground. “Original plat prints” drapes the recorded plat sheets (Sections 1 to 3 together) over the ground, warped to fit the map. “Raw lidar” is a hillshade of the Baltimore County lidar surface, trees and roofs included. “Topographic contours” are drawn from the same lidar every 5 ft (heavier every 25 ft), and show the 1957 ground’s contours before it was regraded.</p>
   <p>Terrain is lidar from 2014 with later regrading removed for 1957. Trees and farm buildings in 1957 are drafted from the aerial photo and are approximate.</p>
 </div></div>
 <div id="about" class="modal" hidden role="dialog" aria-modal="true" aria-label="About the farm"><div class="mcard"><button class="mx" data-close aria-label="Close">×</button>
@@ -278,8 +278,8 @@ try {
   const tL = await loadTex('lotm.png'); tL.colorSpace = THREE.NoColorSpace; tL.generateMipmaps = false; tL.minFilter = THREE.LinearFilter; tL.magFilter = THREE.LinearFilter;
   const tLt = await loadTex('lots.png'); tLt.colorSpace = THREE.NoColorSpace; tLt.generateMipmaps = false; tLt.minFilter = THREE.LinearFilter; tLt.magFilter = THREE.LinearFilter;
   const uLots = { value: 0 }, uLid = { value: 0 }, uTopo = { value: 0 }, uPr = { value: new THREE.Vector4(0, 0, 0, 0) };
-  const [tLid, tTopo, tPrA, tPrB] = await Promise.all([loadTex('lidar.jpg'), loadTex('topo.png'), loadTex('prints_a.png'), loadTex('prints_b.png')]);
-  for (const tx of [tTopo, tPrA, tPrB]) tx.colorSpace = THREE.NoColorSpace;
+  const [tLid, tTopo, tPrA] = await Promise.all([loadTex('lidar.jpg'), loadTex('topo.png'), loadTex('prints.png')]);
+  for (const tx of [tTopo, tPrA]) tx.colorSpace = THREE.NoColorSpace;
   const uCol = { value: 0 }, uSat = { value: 0 }, uOne = { value: 0 };
   const uA = { value: 0 }, uB = { value: 0 };   // blend from the 1957 aerial to the 1964 aerial
   for (const tx of [tPA, tPB]) { tx.colorSpace = THREE.NoColorSpace; tx.generateMipmaps = true; tx.minFilter = THREE.LinearMipmapLinearFilter; }
@@ -321,7 +321,7 @@ try {
       float h = top > 0.5 ? mix(h0, h1, w) : -uBot;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position.x, h, position.z, 1.0); }`;
   const frag = `
-    uniform float uT; uniform sampler2D t57; uniform sampler2D t64; uniform sampler2D t71; uniform float uA; uniform float uB; uniform sampler2D t23; uniform sampler2D tPA; uniform sampler2D tPB; uniform vec4 uPl; uniform vec3 uL; uniform float uSkirt; uniform sampler2D tG; uniform sampler2D tR; uniform sampler2D tL; uniform sampler2D tLt; uniform float uLots; uniform float uYr; uniform float uCol; uniform float uSat; uniform float uOne; uniform sampler2D tLid; uniform sampler2D tTopo; uniform sampler2D tPrA; uniform sampler2D tPrB; uniform float uLid; uniform float uTopo; uniform vec4 uPr;
+    uniform float uT; uniform sampler2D t57; uniform sampler2D t64; uniform sampler2D t71; uniform float uA; uniform float uB; uniform sampler2D t23; uniform sampler2D tPA; uniform sampler2D tPB; uniform vec4 uPl; uniform vec3 uL; uniform float uSkirt; uniform sampler2D tG; uniform sampler2D tR; uniform sampler2D tL; uniform sampler2D tLt; uniform float uLots; uniform float uYr; uniform float uCol; uniform float uSat; uniform float uOne; uniform sampler2D tLid; uniform sampler2D tTopo; uniform sampler2D tPrA; uniform float uLid; uniform float uTopo; uniform vec4 uPr;
     varying vec2 vUv; varying vec3 vN; varying float vWc;
     vec3 sheet(vec3 col, float v, float a){ float cov = smoothstep(0.0, 0.006, v), ink = clamp((v - 0.0039) / 0.996, 0.0, 1.0); return mix(col, mix(vec3(0.75, 0.70, 0.55), vec3(0.02, 0.018, 0.015), ink), cov * a * 0.86); }
     void main(){ float nd = max(dot(normalize(vN), uL), 0.0); float lit = 0.42 + 0.68 * nd;
@@ -340,7 +340,7 @@ try {
       if (uSkirt < 0.5) {
         if (uLid > 0.5) col = texture2D(tLid, vUv).rgb * (0.84 + 0.3 * nd);
         if (uTopo > 0.5) { vec2 tl = texture2D(tTopo, vUv).rg; float ln = mix(tl.g, tl.r, wc); col = mix(col, vec3(0.75, 0.68, 0.48) * (0.8 + 0.25 * nd), uLid > 0.5 ? 0.0 : 0.62); col = mix(col, vec3(0.26, 0.085, 0.02), ln * 0.95); }
-        vec3 pp = texture2D(tPrA, vUv).rgb; col = sheet(col, pp.g, uPr.y); col = sheet(col, pp.r, uPr.x); col = sheet(col, texture2D(tPrB, vUv).r, uPr.w); col = sheet(col, pp.b, uPr.z);
+        col = sheet(col, texture2D(tPrA, vUv).r, uPr.x);
       }
       vec3 base0 = col;
       if (uSkirt < 0.5) {
@@ -357,7 +357,7 @@ try {
       #include <colorspace_fragment>
     }`;
   const mkMat = skirt => new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: frag, side: THREE.DoubleSide,
-    uniforms: { uT, uYr, uEx, uPl, uBot: { value: BOT * VEX }, t57: { value: t57 }, t64: { value: t64 }, t71: { value: t71 }, uA, uB, t23: { value: t23 }, tPA: { value: tPA }, tPB: { value: tPB }, tG: { value: tG }, tR: { value: tR }, tL: { value: tL }, tLt: { value: tLt }, uLots, uCol, uSat, uOne, tLid: { value: tLid }, tTopo: { value: tTopo }, tPrA: { value: tPrA }, tPrB: { value: tPrB }, uLid, uTopo, uPr, uL: { value: LIGHT }, uSkirt: { value: skirt ? 1 : 0 } } });
+    uniforms: { uT, uYr, uEx, uPl, uBot: { value: BOT * VEX }, t57: { value: t57 }, t64: { value: t64 }, t71: { value: t71 }, uA, uB, t23: { value: t23 }, tPA: { value: tPA }, tPB: { value: tPB }, tG: { value: tG }, tR: { value: tR }, tL: { value: tL }, tLt: { value: tLt }, uLots, uCol, uSat, uOne, tLid: { value: tLid }, tTopo: { value: tTopo }, tPrA: { value: tPrA }, uLid, uTopo, uPr, uL: { value: LIGHT }, uSkirt: { value: skirt ? 1 : 0 } } });
 
   const tg = new THREE.BufferGeometry();
   const pos = new Float32Array(N * N * 3), uv = new Float32Array(N * N * 2), h0 = new Float32Array(N * N), h1 = new Float32Array(N * N), top = new Float32Array(N * N).fill(1);
@@ -516,8 +516,8 @@ try {
     const one = isToday && allPlat.checked; uOne.value = one ? 1 : 0; if (one) a.fill(1);   // composite of every plat in a single colour, today only
     uCol.value = colOn.checked ? 1 : 0; uLots.value = lotsCb.checked ? 1 : 0; uSat.value = ss(clamp01((yearAt(s) - 1975) / 14));
     uPl.value.set(a[0], a[1], a[2], a[3]);
-    const onP = prCb.checked ? fade : 0, ap = [0, 0, 0, 0]; for (const st of STOPS) if (st.k !== undefined) ap[st.k] = ss(clamp01((s - (st.s - 0.07)) / 0.07)) * onP;
-    uPr.value.set(ap[0], ap[1], ap[2], ap[3]); uLid.value = lidCb.checked ? 1 : 0; uTopo.value = topoCb.checked ? 1 : 0;
+    const onP = prCb.checked ? fade : 0, ap = [onP, 0, 0, 0];
+    uPr.value.set(onP, 0, 0, 0); uLid.value = lidCb.checked ? 1 : 0; uTopo.value = topoCb.checked ? 1 : 0;
     const f23 = ss(clamp01((t - 0.25) / 0.6)), f57 = ss(clamp01((0.75 - t) / 0.6));
     const yr = yearAt(s); uYr.value = yr; $('dlab').textContent = fmtDate(yr); $('dlab').style.left = posCss(s); placeTrees(tr57, f57, t, yr); placeTrees(tr23, f23, t, yr); placeBlds(bl57, f57, t, yr); placeBlds(bl23, f23, t, yr);
     $('yrnote').textContent = true ? fmtDate(yr) + ' · ' + yrTimes.filter(y => y <= yr).length + ' of ' + yrTimes.length + ' homes with a county year-built are standing · ground: ' + (s > 0.97 ? 'today’s aerial photo' : (uB.value > 0.5 ? '1971' : uA.value > 0.5 ? '1964' : '1957') + ' aerial photo') : '';
@@ -526,7 +526,7 @@ try {
     const n = nearest();
     if (n !== lastNear) { lastNear = n; STOPS.forEach((st, i) => st.el.setAttribute('aria-pressed', i === n)); }
     legend.innerHTML = one ? '<span><i style="background:#ffd91a"></i>All plats, composite (1961–1972)</span>' : [[1], [0, 3], [2]].filter(g => g.some(k => a[k] > 0.05)).map(g => '<span><i style="background:' + LINE_CSS[g[0]] + '"></i>' + (g.length > 1 ? LINE_GROUP : LINE_NAME[g[0]]) + '</span>').join('');
-    if (ap.some(x => x > 0.05)) legend.innerHTML += '<span><i style="background:#e0d6b4"></i>Original plat prints, as recorded</span>';
+    if (ap.some(x => x > 0.05)) legend.innerHTML += '<span><i style="background:#e0d6b4"></i>Original plat prints (Sections 1 to 3, as recorded)</span>';
     if (lidCb.checked) legend.innerHTML += '<span><i style="background:#8a9a5a"></i>Raw lidar surface (Baltimore County, 2014)</span>';
     if (topoCb.checked) legend.innerHTML += '<span><i style="background:#6b3a14"></i>Contours: 5 ft, heavy every 25 ft</span>';
     if (lotsCb.checked) legend.innerHTML += '<span><i style="background:#3a8cff"></i>Lot 1, about 92 ac (1881): Eugene Pocock, with the farmhouse</span><span><i style="background:#ff9a2e"></i>Lot 2, about 60 ac: Salem Wesley Pocock</span>';
