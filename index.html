@@ -38,14 +38,17 @@ h1{margin:0;font:600 24px/1.15 var(--display);letter-spacing:.01em;color:#fff}
 .frow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
 #sl{width:100%;position:relative;padding-top:20px}
 #foot #legend:empty{display:none}
-#layers{top:max(14px,env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));width:244px;box-sizing:border-box;max-height:calc(100vh - 210px);overflow:auto;background:rgba(14,18,22,.84);border:1px solid var(--line);border-radius:14px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 2px 14px rgba(0,0,0,.35);font-size:13px}
-#lhead{all:unset;cursor:pointer;display:flex;justify-content:space-between;align-items:center;width:100%;box-sizing:border-box;padding:9px 14px;font-weight:600;color:var(--fg)}
-#lhead:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:14px}
-#lhead i{font-style:normal;transition:transform .15s}#layers.shut #lhead i{transform:rotate(-90deg)}
-#lbody{padding:0 14px 12px;display:grid;gap:1px}#layers.shut #lbody{display:none}
-#lbody .grp{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:9px 0 2px}
-#layers label{display:flex;gap:7px;align-items:center;color:var(--fg);cursor:pointer;padding:2px 0}
-#layers input[type=checkbox]{accent-color:var(--accent)}
+#rside{top:max(14px,env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));width:244px;display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 210px);overflow:auto}
+.pnl{box-sizing:border-box;background:rgba(14,18,22,.84);border:1px solid var(--line);border-radius:14px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 2px 14px rgba(0,0,0,.35);font-size:13px}
+#rside .phead{all:unset;cursor:pointer;display:flex;justify-content:space-between;align-items:center;width:100%;box-sizing:border-box;padding:9px 14px;font-weight:600;color:var(--fg)}
+#rside .phead:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:14px}
+#rside .phead i{font-style:normal;transition:transform .15s}#rside .pnl.shut .phead i{transform:rotate(-90deg)}
+#rside .pbody{padding:0 14px 12px;display:grid;gap:1px}#rside .pnl.shut .pbody{display:none}
+#qmsg{font-size:12px;color:var(--accent);min-height:0;margin:4px 0 0}#qmsg:empty{display:none}
+.hint2{font-size:11.5px;color:var(--muted);margin:0 0 2px;line-height:1.35}
+#rside .pbody .grp{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:9px 0 2px}
+#rside label{display:flex;gap:7px;align-items:center;color:var(--fg);cursor:pointer;padding:2px 0}
+#rside input[type=checkbox]{accent-color:var(--accent)}
 .modal{position:fixed;inset:0;z-index:10;background:rgba(6,8,10,.62);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
 .modal[hidden]{display:none}
 .mcard{position:relative;background:#171c21;border:1px solid var(--line);border-radius:16px;max-width:740px;width:100%;max-height:calc(100vh - 40px);overflow:auto;padding:20px 26px 24px;box-sizing:border-box;box-shadow:0 10px 50px rgba(0,0,0,.5)}
@@ -70,7 +73,7 @@ h1{margin:0;font:600 24px/1.15 var(--display);letter-spacing:.01em;color:#fff}
 #labels div small{display:none;font-weight:500;font-size:10px;opacity:.85}
 #labels div.near small{display:block}
 #tabs{align-self:flex-start}
-body.own #foot,body.own #labels,body.own #layers,body.own #head .sub{display:none!important}
+body.own #foot,body.own #labels,body.own #rside,body.own #head .sub{display:none!important}
 #own{position:fixed;left:0;right:0;bottom:0;top:var(--ownTop,110px);z-index:3;padding:0 max(14px,env(safe-area-inset-right,0px)) 14px max(14px,env(safe-area-inset-left,0px));pointer-events:none;box-sizing:border-box}
 #own[hidden]{display:none}
 #own .opanel{pointer-events:auto;height:100%;max-width:1320px;margin:0 auto;background:rgba(16,20,24,.92);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.45);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);overflow:hidden}
@@ -134,9 +137,10 @@ body.own #foot,body.own #labels,body.own #layers,body.own #head .sub{display:non
   <div><h1>Roundknoll Farm<span id="mode">Tabletop</span></h1><p class="sub">Baldwin, Maryland · 1957 landscape, the subdivision plats, and today</p></div>
   <div class="hbtns"><div class="seg" id="tabs" role="tablist" aria-label="View"><button id="tab3d" role="tab" aria-pressed="true">Tabletop</button><button id="tabown" role="tab" aria-pressed="false">Owner history</button></div><button id="babout" class="btn">About the farm</button><button id="bhelp" aria-label="Controls and notes" title="Controls and notes">?</button></div>
 </div>
-<div id="layers" class="ui">
-  <button id="lhead" aria-expanded="true" aria-controls="lbody">Layers <i>▾</i></button>
-  <div id="lbody">
+<div id="rside" class="ui">
+<div id="layers" class="pnl">
+  <button id="lhead" class="phead" aria-expanded="true" aria-controls="lbody">Layers <i>▾</i></button>
+  <div id="lbody" class="pbody">
     <div class="grp">Plats</div>
     <label><input id="cplat" type="checkbox" checked> Plat lines</label>
     <label title="The recorded plat sheets, warped to fit the map (Sections 1 to 3 together)"><input id="cpr" type="checkbox"> Original plat prints</label>
@@ -153,6 +157,22 @@ body.own #foot,body.own #labels,body.own #layers,body.own #head .sub{display:non
     <div class="grp">Height</div>
     <label>Scale <input id="vex" type="range" min="1" max="3" step="0.1" value="1.5" style="width:110px;accent-color:var(--accent)"> <output id="vexo" style="min-width:3.2em;color:var(--fg)">1.5×</output></label>
   </div>
+</div>
+<div id="quality" class="pnl shut">
+  <button id="qhead" class="phead" aria-expanded="false" aria-controls="qbody">Quality settings <i>▾</i></button>
+  <div id="qbody" class="pbody">
+    <div class="grp">Aerial photos</div>
+    <label title="4096 px copies of the four aerials (larger download)"><input id="qtex" type="checkbox"> Larger textures (4096)</label>
+    <label title="Experimental: aerials upscaled with an AI model (Real-ESRGAN). It adds plausible detail that is not in the original photos."><input id="qai" type="checkbox"> AI-enhanced aerials</label>
+    <label title="Sharpens the photos on screen"><input id="qsharp" type="checkbox"> Sharpen aerials</label>
+    <div class="grp">Terrain</div>
+    <label title="800 x 800 ground grid instead of 400 x 400, from the 1 m lidar (heavier)"><input id="qmesh" type="checkbox"> Finer terrain mesh (800)</label>
+    <div class="grp">Trees</div>
+    <label title="Every tree placed from the lidar canopy model, coloured from the 2023 aerial"><input id="qltree" type="checkbox" checked> Lidar-placed trees</label>
+    <label title="Lobed, smooth-shaded crowns with leaf texture; layered conifers (heavier)"><input id="qdtree" type="checkbox" checked> Detailed tree shapes</label>
+    <p id="qmsg" aria-live="polite"></p>
+  </div>
+</div>
 </div>
 <div id="own" hidden><div class="opanel"><div id="ownwrap"></div></div></div>
 <div id="status" class="ui"><b>Loading terrain</b><span id="st">0%</span></div>
@@ -172,6 +192,7 @@ body.own #foot,body.own #labels,body.own #layers,body.own #head .sub{display:non
   <p>The timeline steps through the recorded subdivision plats, drawn over the 1957 landscape. From 1961 on, today’s houses appear in the year the county records say they were built (Maryland SDAT year built, matched by street address; a few outbuildings take their house’s year). The Section 1 and Section 2 plat lines share one colour.</p>
   <p>The ground photo fades from the 1957 aerial to the 1964 and then the 1971 aerials (each covers the middle of the map; the edges keep the older photo). The terrain changes patch by patch: each lot switches from the 1957 surface to today’s lidar in the year before its house was built, and the roads are cut in the year after their plat was approved (1962, 1966, 1968, 1973), ahead of the houses. The 2023 aerial replaces the older photos on the regraded patches after 1972, starting in black and white to match the older prints.</p>
   <p><b>Layers.</b> “Colourise photos” gives the old photos an estimated colour borrowed from today’s aerial (interpretive, not original). “All plats over today” draws every plat at once over the current ground. “Original plat prints” drapes the recorded plat sheets (Sections 1 to 3 together) over the ground, warped to fit the map. “Raw lidar” is a hillshade of the Baltimore County lidar surface, trees and roofs included. “Topographic contours” are drawn from the same lidar every 5 ft (heavier every 25 ft), and show the 1957 ground’s contours before it was regraded.</p>
+  <p><b>Quality settings</b> (top right, under Layers). “Larger textures” and “AI-enhanced aerials” load 4096 px copies of the four aerials; the AI version is upscaled with Real-ESRGAN and adds plausible detail that is not in the original photos. “Sharpen aerials” applies an unsharp mask. “Finer terrain mesh” uses an 800 × 800 ground grid built from the 1 m lidar. “Lidar-placed trees” puts a tree at each crown found in the lidar canopy model (about 6,800), coloured from the 2023 aerial; “Detailed tree shapes” swaps the simple blobs and cones for lobed crowns and layered conifers. The last three are heavier, so turn them off if the headset or your computer struggles.</p>
   <p>Terrain is lidar from 2014 with later regrading removed for 1957. Trees and farm buildings in 1957 are drafted from the aerial photo and are approximate.</p>
 </div></div>
 <div id="about" class="modal" hidden role="dialog" aria-modal="true" aria-label="About the farm"><div class="mcard"><button class="mx" data-close aria-label="Close">×</button>
@@ -196,6 +217,7 @@ body.own #foot,body.own #labels,body.own #layers,body.own #head .sub{display:non
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { mergeVertices, mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const $ = id => document.getElementById(id);
 const stEl = $('st'), statusBox = $('status');
@@ -234,36 +256,39 @@ try {
   const get = async (u, t) => { const r = await fetch(u); if (!r.ok) throw new Error(u + ' ' + r.status); return t === 'json' ? r.json() : r.arrayBuffer(); };
   stEl.textContent = 'heights and objects';
   // heightmaps are lossless PNGs: red = high byte, green = low byte of centimetres above the lowest point
-  const heightPng = u => new Promise((res, rej) => { const im = new Image(); im.onload = () => { const c = document.createElement('canvas'); c.width = c.height = N;
-    const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0); res(x.getImageData(0, 0, N, N).data); }; im.onerror = () => rej(new Error('could not load ' + u)); im.src = u; });
+  const heightPng = (u, n = N) => new Promise((res, rej) => { const im = new Image(); im.onload = () => { const c = document.createElement('canvas'); c.width = c.height = n;
+    const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0); res(x.getImageData(0, 0, n, n).data); }; im.onerror = () => rej(new Error('could not load ' + u)); im.src = u; });
   const [b57, b23, scn, house, gyd, rqd] = await Promise.all([heightPng('h1957.png'), heightPng('h2023.png'), get('scene.json', 'json'), get('house.json', 'json'), heightPng('gy.png'), heightPng('rqv.png')]);
-  // grading year of each terrain cell (0 = never regraded): the year its 1957 ground becomes today's ground
-  const GY = new Float32Array(N * N); for (let i = 0; i < N * N; i++) GY[i] = gyd[i * 4] > 0 ? Math.min(1900 + gyd[i * 4], 1989) : 0;   // the timeline ends in 1990: lots whose houses came later still show today's ground by then
-  // the 1971 road is built in from Sweet Air Road outward during 1965: RQ = how far along the build the road cell is (0..1), -1 off the road
+  // the 1965 road is built in from Sweet Air Road outward during 1965: RQ = how far along the build the road cell is (0..1), -1 off the road
   const ROAD0 = 1965.30, ROADSPAN = 0.45;
-  const RQ = new Float32Array(N * N); for (let i = 0; i < N * N; i++) { RQ[i] = rqd[i * 4] > 128 ? rqd[i * 4 + 1] / 255 : -1; if (RQ[i] >= 0) GY[i] = ROAD0 + RQ[i] * ROADSPAN + 0.3; }
-  const RD = new Float32Array(N * N); for (let i = 0; i < N * N; i++) RD[i] = gyd[i * 4 + 1] > 128 ? 1 : 0;
-  const gyAt = (px, py) => GY[Math.round(Math.min(Math.max(py / 1799 * (N - 1), 0), N - 1)) * N + Math.round(Math.min(Math.max(px / 1799 * (N - 1), 0), N - 1))];
-  const toH = d => { const f = new Float32Array(N * N); for (let i = 0; i < N * N; i++) f[i] = (d[i * 4] * 256 + d[i * 4 + 1]) / 100 * VEX; return f; };
-  const Hs = [toH(b57), toH(b23)];             // [1957, today], metres * VEX
-  const cx = W_M / (N - 1), cz = H_M / (N - 1);
-
-  const normalsOf = H => {
-    const n = new Float32Array(N * N * 3);
-    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
-      const i0 = Math.max(i - 1, 0), i1 = Math.min(i + 1, N - 1), j0 = Math.max(j - 1, 0), j1 = Math.min(j + 1, N - 1);
-      const dx = (H[j * N + i1] - H[j * N + i0]) / ((i1 - i0) * cx), dz = (H[j1 * N + i] - H[j0 * N + i]) / ((j1 - j0) * cz);
-      const l = Math.hypot(dx, 1, dz), k = (j * N + i) * 3; n[k] = -dx / l; n[k + 1] = 1 / l; n[k + 2] = -dz / l;
-    }
-    return n;
+  // one terrain grid: n x n cells. The 400 grid is the default; an 800 grid is built on demand from the finer lidar heights (grading, road and drive fields are copied cell for cell).
+  const buildGrid = (n, d57, d23) => {
+    const f = n / N, GY = new Float32Array(n * n), RQ = new Float32Array(n * n), RD = new Float32Array(n * n);   // GY = grading year of each cell (0 = never regraded): the year its 1957 ground becomes today's ground
+    for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { const k = j * n + i, s = (Math.floor(j / f) * N + Math.floor(i / f)) * 4;
+      GY[k] = gyd[s] > 0 ? Math.min(1900 + gyd[s], 1989) : 0;   // the timeline ends in 1990: lots whose houses came later still show today's ground by then
+      RQ[k] = rqd[s] > 128 ? rqd[s + 1] / 255 : -1; if (RQ[k] >= 0) GY[k] = ROAD0 + RQ[k] * ROADSPAN + 0.3;
+      RD[k] = gyd[s + 1] > 128 ? 1 : 0; }
+    const toH = d => { const a = new Float32Array(n * n); for (let i = 0; i < n * n; i++) a[i] = (d[i * 4] * 256 + d[i * 4 + 1]) / 100 * VEX; return a; };
+    const Hs = [toH(d57), toH(d23)];             // [1957, today], metres * VEX
+    const cx = W_M / (n - 1), cz = H_M / (n - 1);
+    const normalsOf = H => {
+      const nn = new Float32Array(n * n * 3);
+      for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+        const i0 = Math.max(i - 1, 0), i1 = Math.min(i + 1, n - 1), j0 = Math.max(j - 1, 0), j1 = Math.min(j + 1, n - 1);
+        const dx = (H[j * n + i1] - H[j * n + i0]) / ((i1 - i0) * cx), dz = (H[j1 * n + i] - H[j0 * n + i]) / ((j1 - j0) * cz);
+        const l = Math.hypot(dx, 1, dz), k = (j * n + i) * 3; nn[k] = -dx / l; nn[k + 1] = 1 / l; nn[k + 2] = -dz / l;
+      }
+      return nn;
+    };
+    return { n, GY, RQ, RD, Hs, Ns: [normalsOf(Hs[0]), normalsOf(Hs[1])] };
   };
-  const Ns = [normalsOf(Hs[0]), normalsOf(Hs[1])];
-
+  const baseGrid = buildGrid(N, b57, b23); let grid = baseGrid, fineGrid = null;
+  const gyAt = (px, py) => { const { n, GY } = grid; return GY[Math.round(Math.min(Math.max(py / 1799 * (n - 1), 0), n - 1)) * n + Math.round(Math.min(Math.max(px / 1799 * (n - 1), 0), n - 1))]; };
   // bilinear terrain height at photo pixel (0..1799) for era e
   const hAt = (e, px, py) => {
-    const fi = Math.min(Math.max(px / 1799 * (N - 1), 0), N - 1.001), fj = Math.min(Math.max(py / 1799 * (N - 1), 0), N - 1.001);
+    const { n, Hs } = grid, fi = Math.min(Math.max(px / 1799 * (n - 1), 0), n - 1.001), fj = Math.min(Math.max(py / 1799 * (n - 1), 0), n - 1.001);
     const i = fi | 0, j = fj | 0, a = fi - i, b = fj - j, H = Hs[e];
-    return (H[j * N + i] * (1 - a) + H[j * N + i + 1] * a) * (1 - b) + (H[(j + 1) * N + i] * (1 - a) + H[(j + 1) * N + i + 1] * a) * b;
+    return (H[j * n + i] * (1 - a) + H[j * n + i + 1] * a) * (1 - b) + (H[(j + 1) * n + i] * (1 - a) + H[(j + 1) * n + i + 1] * a) * b;
   };
   const MX = scn.mx, MY = scn.my;
   const wx = px => (px - 900) * MX, wz = py => (py - 900) * MY;
@@ -277,7 +302,7 @@ try {
   const tR = await loadTex('rdq.png'); tR.colorSpace = THREE.NoColorSpace; tR.generateMipmaps = false; tR.minFilter = THREE.LinearFilter; tR.magFilter = THREE.LinearFilter;
   const tL = await loadTex('lotm.png'); tL.colorSpace = THREE.NoColorSpace; tL.generateMipmaps = false; tL.minFilter = THREE.LinearFilter; tL.magFilter = THREE.LinearFilter;
   const tLt = await loadTex('lots.png'); tLt.colorSpace = THREE.NoColorSpace; tLt.generateMipmaps = false; tLt.minFilter = THREE.LinearFilter; tLt.magFilter = THREE.LinearFilter;
-  const uLots = { value: 0 }, uLid = { value: 0 }, uTopo = { value: 0 }, uPr = { value: new THREE.Vector4(0, 0, 0, 0) };
+  const uLots = { value: 0 }, uLid = { value: 0 }, uTopo = { value: 0 }, uSharp = { value: 0 }, uPr = { value: new THREE.Vector4(0, 0, 0, 0) };
   const [tLid, tTopo, tPrA] = await Promise.all([loadTex('lidar.jpg'), loadTex('topo.png'), loadTex('prints.png')]);
   for (const tx of [tTopo, tPrA]) tx.colorSpace = THREE.NoColorSpace;
   const uCol = { value: 0 }, uSat = { value: 0 }, uOne = { value: 0 };
@@ -321,7 +346,7 @@ try {
       float h = top > 0.5 ? mix(h0, h1, w) : -uBot;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position.x, h, position.z, 1.0); }`;
   const frag = `
-    uniform float uT; uniform sampler2D t57; uniform sampler2D t64; uniform sampler2D t71; uniform float uA; uniform float uB; uniform sampler2D t23; uniform sampler2D tPA; uniform sampler2D tPB; uniform vec4 uPl; uniform vec3 uL; uniform float uSkirt; uniform sampler2D tG; uniform sampler2D tR; uniform sampler2D tL; uniform sampler2D tLt; uniform float uLots; uniform float uYr; uniform float uCol; uniform float uSat; uniform float uOne; uniform sampler2D tLid; uniform sampler2D tTopo; uniform sampler2D tPrA; uniform float uLid; uniform float uTopo; uniform vec4 uPr;
+    uniform float uT; uniform sampler2D t57; uniform sampler2D t64; uniform sampler2D t71; uniform float uA; uniform float uB; uniform sampler2D t23; uniform sampler2D tPA; uniform sampler2D tPB; uniform vec4 uPl; uniform vec3 uL; uniform float uSkirt; uniform sampler2D tG; uniform sampler2D tR; uniform sampler2D tL; uniform sampler2D tLt; uniform float uLots; uniform float uYr; uniform float uCol; uniform float uSat; uniform float uOne; uniform sampler2D tLid; uniform sampler2D tTopo; uniform sampler2D tPrA; uniform float uLid; uniform float uTopo; uniform vec4 uPr; uniform float uSharp;
     varying vec2 vUv; varying vec3 vN; varying float vWc;
     vec3 sheet(vec3 col, float v, float a){ float cov = smoothstep(0.0, 0.006, v), ink = clamp((v - 0.0039) / 0.996, 0.0, 1.0); return mix(col, mix(vec3(0.75, 0.70, 0.55), vec3(0.02, 0.018, 0.015), ink), cov * a * 0.86); }
     void main(){ float nd = max(dot(normalize(vN), uL), 0.0); float lit = 0.42 + 0.68 * nd;
@@ -329,6 +354,10 @@ try {
       vec4 lm = texture2D(tL, vUv); rt = max(rt, lm.g * smoothstep(lm.r * 80.0 + 1949.0, lm.r * 80.0 + 1950.0, uYr));   // each house's lot (driveway, yard) shows the 1971 photo in the year its house goes up   // the 1971 road surface alone, laid in from Sweet Air Road
       vec3 a = mix(mix(texture2D(t57, vUv).rgb, texture2D(t64, vUv).rgb, uA), texture2D(t71, vUv).rgb, max(uB, rt)) * vec3(1.04, 1.0, 0.9);
       vec3 b = texture2D(t23, vUv).rgb * 1.12;
+      if (uSharp > 0.0) {   // unsharp mask against a blurred (mip-biased) copy of the same photo
+        vec3 ab = mix(mix(texture2D(t57, vUv, 1.7).rgb, texture2D(t64, vUv, 1.7).rgb, uA), texture2D(t71, vUv, 1.7).rgb, max(uB, rt)) * vec3(1.04, 1.0, 0.9);
+        a = max(a + uSharp * (a - ab), 0.0); b = max(b + uSharp * (b - texture2D(t23, vUv, 1.7).rgb * 1.12), 0.0);
+      }
       const vec3 LW = vec3(0.2126, 0.7152, 0.0722);
       a = mix(vec3(dot(a, LW)), a, uCol);                                    // old photos are black-and-white unless colourised
       float lb = clamp(dot(b, LW) * 1.172 + 0.155, 0.0, 1.0);                // today's photo, tone-matched to the 1971 print, gains its colour over the later years
@@ -357,38 +386,44 @@ try {
       #include <colorspace_fragment>
     }`;
   const mkMat = skirt => new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: frag, side: THREE.DoubleSide,
-    uniforms: { uT, uYr, uEx, uPl, uBot: { value: BOT * VEX }, t57: { value: t57 }, t64: { value: t64 }, t71: { value: t71 }, uA, uB, t23: { value: t23 }, tPA: { value: tPA }, tPB: { value: tPB }, tG: { value: tG }, tR: { value: tR }, tL: { value: tL }, tLt: { value: tLt }, uLots, uCol, uSat, uOne, tLid: { value: tLid }, tTopo: { value: tTopo }, tPrA: { value: tPrA }, uLid, uTopo, uPr, uL: { value: LIGHT }, uSkirt: { value: skirt ? 1 : 0 } } });
+    uniforms: { uT, uYr, uEx, uPl, uBot: { value: BOT * VEX }, t57: { value: t57 }, t64: { value: t64 }, t71: { value: t71 }, uA, uB, t23: { value: t23 }, tPA: { value: tPA }, tPB: { value: tPB }, tG: { value: tG }, tR: { value: tR }, tL: { value: tL }, tLt: { value: tLt }, uLots, uCol, uSat, uOne, tLid: { value: tLid }, tTopo: { value: tTopo }, tPrA: { value: tPrA }, uLid, uTopo, uPr, uSharp, uL: { value: LIGHT }, uSkirt: { value: skirt ? 1 : 0 } } });
 
-  const tg = new THREE.BufferGeometry();
-  const pos = new Float32Array(N * N * 3), uv = new Float32Array(N * N * 2), h0 = new Float32Array(N * N), h1 = new Float32Array(N * N), top = new Float32Array(N * N).fill(1);
-  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
-    const k = j * N + i;
-    pos[k * 3] = (i / (N - 1) - 0.5) * W_M; pos[k * 3 + 1] = 0; pos[k * 3 + 2] = (j / (N - 1) - 0.5) * H_M;
-    uv[k * 2] = (i / (N - 1) * 1799 + 0.5) / 1800; uv[k * 2 + 1] = 1 - (j / (N - 1) * 1799 + 0.5) / 1800;
-    h0[k] = Hs[0][k]; h1[k] = Hs[1][k];
-  }
-  const idx = new Uint32Array((N - 1) * (N - 1) * 6); let q = 0;
-  for (let j = 0; j < N - 1; j++) for (let i = 0; i < N - 1; i++) { const a = j * N + i, b = a + 1, c = a + N, d = c + 1; idx.set([a, c, b, b, c, d], q); q += 6; }
-  tg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); tg.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
-  tg.setAttribute('h0', new THREE.BufferAttribute(h0, 1)); tg.setAttribute('h1', new THREE.BufferAttribute(h1, 1)); tg.setAttribute('top', new THREE.BufferAttribute(top, 1));
-  tg.setAttribute('n0', new THREE.BufferAttribute(Ns[0], 3)); tg.setAttribute('n1', new THREE.BufferAttribute(Ns[1], 3));
-  tg.setIndex(new THREE.BufferAttribute(idx, 1)); tg.setAttribute('gy', new THREE.BufferAttribute(GY, 1)); tg.setAttribute('rd', new THREE.BufferAttribute(RD, 1)); tg.setAttribute('rq', new THREE.BufferAttribute(RQ, 1));
-  const terrain = new THREE.Mesh(tg, mkMat(false)); terrain.frustumCulled = false; world.add(terrain);
-
-  // base walls and bottom
-  { const P = [], U = [], A0 = [], A1 = [], T = [], NN = [], I = []; let v = 0;
-    const edge = (pts, nx, nz) => { for (let s = 0; s < pts.length; s++) { const [i, j] = pts[s], k = j * N + i, x = (i / (N - 1) - 0.5) * W_M, z = (j / (N - 1) - 0.5) * H_M;
+  const matT = mkMat(false), matS = mkMat(true), mats = [matT, matS];
+  let terrain = null, skirtMesh = null;
+  const buildTerrain = () => {
+    for (const m of [terrain, skirtMesh]) if (m) { world.remove(m); m.geometry.dispose(); }
+    const { n, GY, RD, RQ, Hs, Ns } = grid;
+    const tg = new THREE.BufferGeometry();
+    const pos = new Float32Array(n * n * 3), uv = new Float32Array(n * n * 2), h0 = new Float32Array(n * n), h1 = new Float32Array(n * n), top = new Float32Array(n * n).fill(1);
+    for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+      const k = j * n + i;
+      pos[k * 3] = (i / (n - 1) - 0.5) * W_M; pos[k * 3 + 1] = 0; pos[k * 3 + 2] = (j / (n - 1) - 0.5) * H_M;
+      uv[k * 2] = (i / (n - 1) * 1799 + 0.5) / 1800; uv[k * 2 + 1] = 1 - (j / (n - 1) * 1799 + 0.5) / 1800;
+      h0[k] = Hs[0][k]; h1[k] = Hs[1][k];
+    }
+    const idx = new Uint32Array((n - 1) * (n - 1) * 6); let q = 0;
+    for (let j = 0; j < n - 1; j++) for (let i = 0; i < n - 1; i++) { const a = j * n + i, b = a + 1, c = a + n, d = c + 1; idx.set([a, c, b, b, c, d], q); q += 6; }
+    tg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); tg.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    tg.setAttribute('h0', new THREE.BufferAttribute(h0, 1)); tg.setAttribute('h1', new THREE.BufferAttribute(h1, 1)); tg.setAttribute('top', new THREE.BufferAttribute(top, 1));
+    tg.setAttribute('n0', new THREE.BufferAttribute(Ns[0], 3)); tg.setAttribute('n1', new THREE.BufferAttribute(Ns[1], 3));
+    tg.setIndex(new THREE.BufferAttribute(idx, 1)); tg.setAttribute('gy', new THREE.BufferAttribute(GY, 1)); tg.setAttribute('rd', new THREE.BufferAttribute(RD, 1)); tg.setAttribute('rq', new THREE.BufferAttribute(RQ, 1));
+    terrain = new THREE.Mesh(tg, matT); terrain.frustumCulled = false; world.add(terrain);
+    // base walls and bottom
+    const P = [], U = [], A0 = [], A1 = [], T = [], NN = [], I = []; let v = 0;
+    const edge = (pts, nx, nz) => { for (let s = 0; s < pts.length; s++) { const [i, j] = pts[s], k = j * n + i, x = (i / (n - 1) - 0.5) * W_M, z = (j / (n - 1) - 0.5) * H_M;
         for (const tp of [1, 0]) { P.push(x, 0, z); U.push(0, 0); A0.push(Hs[0][k]); A1.push(Hs[1][k]); T.push(tp); NN.push(nx, 0, nz); }
         if (s) { const a = v - 2, b = v - 1, c = v, d = v + 1; I.push(a, b, c, c, b, d); } v += 2; } };
-    const r = [...Array(N).keys()];
-    edge(r.map(i => [i, 0]), 0, -1); edge(r.map(i => [i, N - 1]), 0, 1); edge(r.map(j => [0, j]), -1, 0); edge(r.map(j => [N - 1, j]), 1, 0);
+    const r = [...Array(n).keys()];
+    edge(r.map(i => [i, 0]), 0, -1); edge(r.map(i => [i, n - 1]), 0, 1); edge(r.map(j => [0, j]), -1, 0); edge(r.map(j => [n - 1, j]), 1, 0);
     for (const [x, z] of [[-.5, -.5], [.5, -.5], [-.5, .5], [.5, .5]]) { P.push(x * W_M, 0, z * H_M); U.push(0, 0); A0.push(0); A1.push(0); T.push(0); NN.push(0, -1, 0); }
     I.push(v, v + 1, v + 2, v + 2, v + 1, v + 3);
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2));
     g.setAttribute('h0', new THREE.Float32BufferAttribute(A0, 1)); g.setAttribute('h1', new THREE.Float32BufferAttribute(A1, 1)); g.setAttribute('top', new THREE.Float32BufferAttribute(T, 1));
     g.setAttribute('n0', new THREE.Float32BufferAttribute(NN, 3)); g.setAttribute('n1', new THREE.Float32BufferAttribute(NN, 3)); g.setAttribute('gy', new THREE.Float32BufferAttribute(new Float32Array(P.length / 3), 1)); g.setAttribute('rd', new THREE.Float32BufferAttribute(new Float32Array(P.length / 3), 1)); g.setAttribute('rq', new THREE.Float32BufferAttribute(new Float32Array(P.length / 3).fill(-1), 1)); g.setIndex(I);
-    const skirt = new THREE.Mesh(g, mkMat(true)); skirt.frustumCulled = false; world.add(skirt); }
+    skirtMesh = new THREE.Mesh(g, matS); skirtMesh.frustumCulled = false; world.add(skirtMesh);
+  };
+  buildTerrain();
 
   // ---------- trees ----------
   stEl.textContent = 'trees and buildings';
@@ -396,18 +431,44 @@ try {
   const wob = g => { const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i), f = 1 + 0.2 * Math.sin(x * 7.1 + z * 3.3 + y * 5.2) * Math.cos(z * 6.1 - x * 2.7); p.setXYZ(i, x * f, y, z * f); } g.computeVertexNormals(); return g; };
   const broadG = wob(new THREE.IcosahedronGeometry(1, 1).translate(0, 1, 0)), coneG = new THREE.ConeGeometry(1, 2, 7).translate(0, 1, 0), trunkG = new THREE.CylinderGeometry(0.22, 0.32, 1, 5).translate(0, 0.5, 0);
   const leafMat = new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true }), trunkMat = new THREE.MeshLambertMaterial({ color: 0x4a3a2a });
-  const makeTrees = (list, e) => {
-    const kind = list.map(t => rnd() < ((e === 0 ? t[4] : 1) ? 0.3 : 0.12) ? 1 : 0), nC = kind.reduce((a, b) => a + b, 0), nB = list.length - nC;
-    const mB = new THREE.InstancedMesh(broadG, leafMat, nB), mC = new THREE.InstancedMesh(coneG, leafMat, nC), mT = new THREE.InstancedMesh(trunkG, trunkMat, list.length);
+  // detailed crowns: several welded, noise-displaced lobes with smooth shading, and a leaf-speckle shader; conifers are stacked tiers
+  const lobe = (x, y, z, rx, ry, det, sd) => { let g = new THREE.IcosahedronGeometry(1, det); g.deleteAttribute('normal'); g.deleteAttribute('uv'); g = mergeVertices(g); const p = g.attributes.position;
+    for (let i = 0; i < p.count; i++) { const a = p.getX(i), b = p.getY(i), c = p.getZ(i), f = 1 + 0.24 * Math.sin(a * 5.3 + sd) * Math.cos(c * 4.7 - sd * 1.7) + 0.12 * Math.sin(b * 9.1 + a * 6.3 + sd * 2.3); p.setXYZ(i, x + a * rx * f, y + b * ry * f, z + c * rx * f); }
+    g.computeVertexNormals(); return g; };
+  const broadD = mergeGeometries([lobe(0, 1.02, 0, 0.8, 0.95, 2, 0.3), lobe(0.52, 0.78, 0.16, 0.52, 0.5, 1, 1.9), lobe(-0.46, 0.86, -0.26, 0.55, 0.52, 1, 3.1), lobe(0.12, 1.38, -0.28, 0.46, 0.46, 1, 4.4)]);
+  const tier = (rad, h, y, sd) => { const g = new THREE.ConeGeometry(rad, h, 10, 1).translate(0, y + h / 2, 0); const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const a = p.getX(i), c = p.getZ(i), f = 1 + 0.14 * Math.sin(a * 9 + sd) * Math.cos(c * 8 - sd); p.setXYZ(i, a * f, p.getY(i), c * f); } g.computeVertexNormals(); return g; };
+  const coneD = mergeGeometries([tier(0.98, 0.72, 0, 0.2), tier(0.82, 0.68, 0.42, 1.4), tier(0.62, 0.64, 0.86, 2.6), tier(0.4, 0.6, 1.4, 3.8)]);
+  const leafMatD = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  leafMatD.onBeforeCompile = sh => {
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vOP;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvOP = position;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
+varying vec3 vOP;
+float h3(vec3 p){ return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
+float n3(vec3 p){ vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(h3(i), h3(i + vec3(1,0,0)), f.x), mix(h3(i + vec3(0,1,0)), h3(i + vec3(1,1,0)), f.x), f.y), mix(mix(h3(i + vec3(0,0,1)), h3(i + vec3(1,0,1)), f.x), mix(h3(i + vec3(0,1,1)), h3(i + vec3(1,1,1)), f.x), f.y), f.z); }`)
+      .replace('#include <color_fragment>', `#include <color_fragment>
+float nn = n3(vOP * 7.0) * 0.6 + n3(vOP * 17.0) * 0.4; diffuseColor.rgb *= 0.55 + 0.9 * nn; diffuseColor.rgb *= 0.78 + 0.32 * clamp(vOP.y * 0.5, 0.0, 1.0);`);
+  };
+  leafMatD.customProgramCacheKey = () => 'leafD';
+  const makeTrees = (list, e, detail, lidar) => {
+    const kind = lidar ? list.map(t => t[4]) : list.map(t => rnd() < ((e === 0 ? t[4] : 1) ? 0.3 : 0.12) ? 1 : 0), nC = kind.reduce((a, b) => a + b, 0), nB = list.length - nC;
+    const lm = detail ? leafMatD : leafMat;
+    const mB = new THREE.InstancedMesh(detail ? broadD : broadG, lm, nB), mC = new THREE.InstancedMesh(detail ? coneD : coneG, lm, nC), mT = new THREE.InstancedMesh(trunkG, trunkMat, list.length);
     const col = new THREE.Color(); let ib = 0, ic = 0; const slot = [];
     list.forEach((t, k) => {
       if (kind[k]) { col.setHSL(0.40 + (rnd() - .5) * .03, 0.38 + (rnd() - .5) * .1, 0.16 + rnd() * .06); mC.setColorAt(ic, col); slot.push(ic++); }
-      else { col.setHSL((e === 0 ? 0.24 : 0.27) + (rnd() - .5) * .05, 0.36 + (rnd() - .5) * .12, 0.20 + rnd() * .09); mB.setColorAt(ib, col); slot.push(ib++); }
+      else { if (lidar) col.setRGB(Math.min(t[5] / 255 * 1.05, 1), Math.min(t[6] / 255 * 1.1, 1), Math.min(t[7] / 255 * 0.95, 1), THREE.SRGBColorSpace); else col.setHSL((e === 0 ? 0.24 : 0.27) + (rnd() - .5) * .05, 0.36 + (rnd() - .5) * .12, 0.20 + rnd() * .09); mB.setColorAt(ib, col); slot.push(ib++); }
     });
     for (const m of [mB, mC, mT]) { m.frustumCulled = false; world.add(m); }
     return { mB, mC, mT, list, kind, slot, g: [list.map(t => hAt(0, t[0], t[1])), list.map(t => hAt(1, t[0], t[1]))], gv: list.map(t => gyAt(t[0], t[1])) };
   };
-  const tr57 = makeTrees(scn.t57, 0), tr23 = makeTrees(scn.t23, 1);
+  let tr57 = null, tr23 = null, lidarTrees = null, treeKey = '';
+  const buildTrees = async (lt, dt) => {
+    if (lt && !lidarTrees) lidarTrees = (await get('trees.json', 'json')).t;
+    for (const T of [tr57, tr23]) if (T) for (const m of [T.mB, T.mC, T.mT]) { world.remove(m); m.dispose(); }
+    tr57 = makeTrees(scn.t57, 0, dt, false); tr23 = makeTrees(lt ? lidarTrees : scn.t23, 1, dt, lt);
+    treeKey = (lt ? 'L' : 'o') + (dt ? 'D' : 'o'); shownS = -1;
+  };
   const dummy = new THREE.Object3D();
   const sstep = x => { x = Math.min(Math.max(x, 0), 1); return x * x * (3 - 2 * x); };
   const wLocal = (g, yr, t) => g > 0.5 ? sstep((yr - (g - 1.0)) / 1.6) : t;   // same rule as the terrain shader
@@ -464,7 +525,7 @@ try {
     world.add(grp);
     const gd = [0, 1].map(k => Math.min(...b.p.map(p => hAt(k, p[0], p[1]))));
     let lab = null; if (e === 1 && b.y) { lab = document.createElement('div'); lab.innerHTML = '<span>' + b.y + '</span>' + (b.a ? '<small>' + b.a + '</small>' : ''); $('labels').appendChild(lab); }
-    return { lab, lx: o.cx, lz: o.cz, lh: b.h, mesh: grp, gd, y: b.y, gv: gyAt(b.p.reduce((a, p) => a + p[0], 0) / b.p.length, b.p.reduce((a, p) => a + p[1], 0) / b.p.length) };
+    return { lab, lx: o.cx, lz: o.cz, lh: b.h, mesh: grp, gd, fp: b.p, y: b.y, gv: gyAt(b.p.reduce((a, p) => a + p[0], 0) / b.p.length, b.p.reduce((a, p) => a + p[1], 0) / b.p.length) };
   });
   const HERO = 37;   // the owner's farmhouse, built from photos instead of a generic footprint
   const bl57 = makeBlds(scn.b57, 0), bl23 = makeBlds(scn.b23.filter((b, i) => i !== HERO && !(b.y > 1990)), 1);   // houses built after 1990 belong to the neighbouring development and are left out
@@ -475,7 +536,7 @@ try {
     const turn = new THREE.Group(); turn.rotation.y = house.rotY; turn.add(mesh);
     const pivot = new THREE.Group(); pivot.position.set(house.pos[0], 0, house.pos[1]); pivot.add(turn); world.add(pivot);
     const fp = scn.b23[HERO].p, gd = [0, 1].map(k => Math.min(...fp.map(p => hAt(k, p[0], p[1]))));
-    return { mesh: pivot, gd, gv: gyAt(fp.reduce((a, p) => a + p[0], 0) / fp.length, fp.reduce((a, p) => a + p[1], 0) / fp.length) };
+    return { mesh: pivot, gd, fp, gv: gyAt(fp.reduce((a, p) => a + p[0], 0) / fp.length, fp.reduce((a, p) => a + p[1], 0) / fp.length) };
   };
   bl23.push(makeHero(house.parts.today)); bl57.push(makeHero(house.parts.y1957));
   const placeBlds = (L, f, t, yr) => { for (const B of L) { const { mesh, gd, y, gv } = B; const fv = y ? clamp01(yr - y + 1) : f, s = Math.max(fv, 0.0001), wl = wLocal(gv, yr, t); mesh.position.y = gd[0] * (1 - wl) + gd[1] * wl; mesh.scale.y = s; mesh.visible = fv > 0.003; B.on = fv > 0.6 && showBld.checked; } };
@@ -574,6 +635,32 @@ try {
       if (labV.z > 1 || Math.abs(labV.x) > 1.05 || Math.abs(labV.y) > 1.05) { el.style.display = 'none'; continue; }
       el.style.display = 'block'; el.classList.toggle('near', d < D0 * 0.55);
       el.style.transform = 'translate(' + ((labV.x * 0.5 + 0.5) * w) + 'px,' + ((-labV.y * 0.5 + 0.5) * h) + 'px) translate(-50%,-100%)'; } };
+
+  // ---------- quality settings ----------
+  const refreshHeights = () => {
+    for (const T of [tr57, tr23]) if (T) T.g = [T.list.map(t => hAt(0, t[0], t[1])), T.list.map(t => hAt(1, t[0], t[1]))];
+    for (const B of [...bl57, ...bl23]) B.gd = [0, 1].map(k => Math.min(...B.fp.map(p => hAt(k, p[0], p[1]))));
+  };
+  const Qe = { tex: $('qtex'), ai: $('qai'), sharp: $('qsharp'), mesh: $('qmesh'), lt: $('qltree'), dt: $('qdtree') }, qmsg = $('qmsg');
+  const photoNames = { t57: 'tex1957c', t64: 'tex1964c', t71: 'tex1971c', t23: 'tex2023' };
+  const photoSets = { std: { t57, t64, t71, t23 } };
+  let curSet = 'std', fineOn = false, qBusy = Promise.resolve();
+  const loadSet = async name => { if (photoSets[name]) return photoSets[name]; const r = await Promise.all(Object.entries(photoNames).map(([k, f]) => loadTex(f + '_' + name + '.jpg').then(tx => [k, tx]))); return (photoSets[name] = Object.fromEntries(r)); };
+  const applyQ = async () => {
+    try {
+      const want = Qe.ai.checked ? 'ai' : Qe.tex.checked ? '4k' : 'std';
+      if (want !== curSet) { qmsg.textContent = want === 'std' ? '' : 'Loading ' + (want === 'ai' ? 'AI-enhanced' : '4096') + ' aerials…'; const S = await loadSet(want); for (const m of mats) for (const k in S) m.uniforms[k].value = S[k]; curSet = want; }
+      uSharp.value = Qe.sharp.checked ? 0.9 : 0;
+      if (Qe.mesh.checked !== fineOn) { qmsg.textContent = 'Building the finer terrain…';
+        if (Qe.mesh.checked && !fineGrid) { const [f57, f23] = await Promise.all([heightPng('h1957_800.png', 800), heightPng('h2023_800.png', 800)]); fineGrid = buildGrid(800, f57, f23); }
+        grid = Qe.mesh.checked ? fineGrid : baseGrid; fineOn = Qe.mesh.checked; buildTerrain(); refreshHeights(); }
+      const lt = Qe.lt.checked, dt = Qe.dt.checked;
+      if (((lt ? 'L' : 'o') + (dt ? 'D' : 'o')) !== treeKey) { qmsg.textContent = 'Placing trees…'; await buildTrees(lt, dt); }
+      qmsg.textContent = ''; shownS = -1;
+    } catch (err) { console.error(err); qmsg.textContent = 'Could not apply that setting: ' + err.message; }
+  };
+  for (const el of Object.values(Qe)) el.onchange = () => { qBusy = qBusy.then(applyQ); };
+  await buildTrees(Qe.lt.checked, Qe.dt.checked);
 
   // ---------- Owner history tab (from the recorded deeds, 1860 - 2015) ----------
   try {
@@ -781,13 +868,15 @@ return mount;})();
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
-  var L = $('layers'), lh = $('lhead');
-  var shut = false; try { shut = localStorage.getItem('layersShut') === '1'; } catch (e) {}
-  if (shut === false && window.innerWidth < 760) shut = true;
-  function setShut(s) { L.classList.toggle('shut', s); lh.setAttribute('aria-expanded', !s); try { localStorage.setItem('layersShut', s ? '1' : '0'); } catch (e) {} }
-  function place() { var h = $('head').getBoundingClientRect(); L.style.top = innerWidth <= 820 ? Math.ceil(h.bottom + 8) + 'px' : ''; L.style.maxHeight = innerWidth <= 820 ? 'calc(100vh - ' + Math.ceil(h.bottom + 200) + 'px)' : ''; }
+  var R = $('rside');
+  function collapsible(id, hid, key, dflt) {
+    var P = $(id), H = $(hid), shut = dflt; try { var s = localStorage.getItem(key); if (s !== null) shut = s === '1'; } catch (e) {}
+    function set(x) { P.classList.toggle('shut', x); H.setAttribute('aria-expanded', !x); try { localStorage.setItem(key, x ? '1' : '0'); } catch (e) {} }
+    set(shut); H.onclick = function () { set(!P.classList.contains('shut')); };
+  }
+  collapsible('layers', 'lhead', 'layersShut', window.innerWidth < 760); collapsible('quality', 'qhead', 'qualityShut', true);
+  function place() { var h = $('head').getBoundingClientRect(); R.style.top = innerWidth <= 820 ? Math.ceil(h.bottom + 8) + 'px' : ''; R.style.maxHeight = innerWidth <= 820 ? 'calc(100vh - ' + Math.ceil(h.bottom + 200) + 'px)' : ''; }
   addEventListener('resize', place); place();
-  setShut(shut); lh.onclick = function () { setShut(!L.classList.contains('shut')); };
   function open(m) { $('help').hidden = true; $('about').hidden = true; m.hidden = false; }
   $('bhelp').onclick = function () { open($('help')); }; $('babout').onclick = function () { open($('about')); };
   document.querySelectorAll('.modal').forEach(function (m) { m.addEventListener('click', function (e) { if (e.target === m || e.target.hasAttribute('data-close')) m.hidden = true; }); });
