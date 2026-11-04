@@ -364,7 +364,7 @@ try {
       float c = smoothstep(0.40, 0.74, n) * smoothstep(0.18, 0.62, cfbm(p * 0.45 + q));
       return c * (1.0 - smoothstep(0.30, 0.50, length(uv - 0.5)));
     }`;
-  const CLOUDS = [{ y: 0.10, size: 1.6, seed: 0.0, scale: 1.0, wind: [0.016, 0.006], alpha: 0.78 }, { y: 0.17, size: 1.8, seed: 3.7, scale: 0.8, wind: [0.024, -0.005], alpha: 0.62 }, { y: 0.26, size: 2.0, seed: 8.1, scale: 0.65, wind: [0.011, 0.009], alpha: 0.5 }];
+  const CLOUDS = [{ y: 0.10, size: 1.6, seed: 0.0, scale: 1.0, wind: [0.016, 0.006], alpha: 0.6 }, { y: 0.17, size: 1.8, seed: 3.7, scale: 0.8, wind: [0.024, -0.005], alpha: 0.5 }, { y: 0.26, size: 2.0, seed: 8.1, scale: 0.65, wind: [0.011, 0.009], alpha: 0.38 }];
   const cloudFrag = `uniform float uTime; uniform float uSeed; uniform float uScale; uniform vec2 uWind; uniform float uAlpha; varying vec2 vUv;` + CLOUD_FN + `
     void main(){ float d = cloudD(vUv, uTime, uSeed, uScale, uWind); gl_FragColor = vec4(1.0, 1.0, 1.0, min(d * 1.15, 1.0) * uAlpha); }`;
   const clouds = CLOUDS.map(c => {
@@ -962,8 +962,8 @@ return mount;})();
     const bodyGeo = new THREE.BufferGeometry(); bodyGeo.setAttribute('position', new THREE.Float32BufferAttribute([0.55, 0, 0, -0.45, 0, 0.13, -0.45, 0, -0.13], 3));
     const mkBird = sc => { const g = new THREE.Group(), wr = new THREE.Mesh(wingGeo, birdMat), wl = new THREE.Mesh(wingGeo, birdMat); wl.scale.z = -1; g.add(new THREE.Mesh(bodyGeo, birdMat), wr, wl); g.scale.setScalar(sc); g.visible = false; rig.add(g); return { g, wr, wl, ph: rnd(0, 6.28) }; };
     const flap = (b, now, k) => { const a = Math.sin(now * k + b.ph) * 0.65; b.wr.rotation.x = a; b.wl.rotation.x = -a; };
-    for (let i = 0; i < 6; i++) { const b = mkBird(rnd(0.026, 0.036)); b.cx = rnd(-0.22, 0.22); b.cz = rnd(-0.22, 0.22); b.R = rnd(0.1, 0.3); b.y = rnd(0.12, 0.3); b.w = rnd(0.16, 0.3) * (Math.random() < 0.5 ? -1 : 1); b.a = rnd(0, 6.28); b.bob = rnd(0, 6.28); life.birds.push(b); }
-    for (let i = 0; i < 7; i++) life.flock.push(mkBird(0.03));
+    for (let i = 0; i < 6; i++) { const b = mkBird(rnd(0.012, 0.017)); b.cx = rnd(-0.22, 0.22); b.cz = rnd(-0.22, 0.22); b.R = rnd(0.1, 0.3); b.y = rnd(0.12, 0.3); b.w = rnd(0.16, 0.3) * (Math.random() < 0.5 ? -1 : 1); b.a = rnd(0, 6.28); b.bob = rnd(0, 6.28); life.birds.push(b); }
+    for (let i = 0; i < 7; i++) life.flock.push(mkBird(0.015));
     const flockState = { on: false, t: 0, next: 10, x0: 0, z0: 0, dx: 0, dz: 0, y: 0.34 };
     let wasAnim = true;
     life.update = (now, dt) => {
