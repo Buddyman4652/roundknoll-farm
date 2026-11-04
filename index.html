@@ -59,10 +59,10 @@ h1{margin:0;font:600 24px/1.15 var(--display);letter-spacing:.01em;color:#fff}
 .mcard .mx:hover{background:rgba(255,255,255,.1)}
 #blend{width:100%;display:block;margin:0;accent-color:var(--accent)}
 #dlab{position:absolute;top:0;transform:translateX(-50%);font-weight:600;font-size:12px;color:var(--fg);white-space:nowrap;pointer-events:none}
-#ticks{position:relative;height:28px;margin-top:1px}
+#ticks{position:relative;height:22px;margin-top:1px}
 #ticks i{position:absolute;top:0;width:1px;height:4px;background:var(--line);transform:translateX(-50%)}
 #ticks i.m{height:7px;background:var(--muted)}
-#ticks b{position:absolute;top:13px;font-weight:500;font-size:10px;color:var(--muted);transform:translateX(-50%)}
+#ticks b{position:absolute;top:8px;font-weight:500;font-size:10px;color:var(--muted);transform:translateX(-50%)}
 .btn{all:unset;cursor:pointer;padding:7px 14px;border:1px solid var(--line);border-radius:10px;font-weight:500}
 .btn:hover{border-color:var(--accent)}
 .btn[hidden]{display:none}
@@ -73,12 +73,8 @@ h1{margin:0;font:600 24px/1.15 var(--display);letter-spacing:.01em;color:#fff}
 #labels div small{display:none;font-weight:500;font-size:10px;opacity:.85}
 #labels div.near small{display:block}
 #tabs{align-self:flex-start}
-body.own #foot,body.own #labels,body.own #rside,body.own #head .sub,body.own #compass,body.own #tip{display:none!important}
-#ticks .tle{all:unset;box-sizing:border-box;position:absolute;top:0;width:9px;height:9px;margin-left:-4.5px;transform:rotate(45deg);background:var(--accent);border:1px solid #14181c;border-radius:2px;cursor:pointer;z-index:1}
-#ticks .tle::after{content:"";position:absolute;inset:-9px}
-#ticks .tle:hover,#ticks .tle:focus-visible{background:#fff;outline:2px solid var(--accent);outline-offset:2px}
-#tip{position:fixed;z-index:7;max-width:330px;box-sizing:border-box;background:rgba(14,18,22,.97);border:1px solid var(--accent);border-radius:12px;padding:10px 13px;font-size:13px;line-height:1.4;color:var(--fg);box-shadow:0 4px 22px rgba(0,0,0,.5);pointer-events:none;display:none}
-#tip b{display:block;font-size:14px;color:#fff}#tip small{display:block;color:var(--accent);font-weight:600;margin:1px 0 5px}
+body.own #foot,body.own #labels,body.own #rside,body.own #head .sub,body.own #compass{display:none!important}
+#evbox{flex:1 1 280px;margin-left:auto;max-width:520px;font-size:12.5px;line-height:1.4;color:var(--fg);border-left:3px solid var(--accent);padding:2px 0 2px 12px}#evbox:empty{display:none}#evbox b{display:block;font-size:13.5px;color:#fff}#evbox small{display:block;color:var(--accent);font-weight:600;margin:0 0 2px}
 #compass{left:max(16px,env(safe-area-inset-left,0px));bottom:150px;width:84px;height:84px;pointer-events:none;filter:drop-shadow(0 2px 8px rgba(0,0,0,.55))}
 #own{position:fixed;left:0;right:0;bottom:0;top:var(--ownTop,110px);z-index:3;padding:0 max(14px,env(safe-area-inset-right,0px)) 14px max(14px,env(safe-area-inset-left,0px));pointer-events:none;box-sizing:border-box}
 #own[hidden]{display:none}
@@ -140,7 +136,7 @@ body.own #foot,body.own #labels,body.own #rside,body.own #head .sub,body.own #co
 <canvas id="stage" aria-label="3D tabletop model of the farm"></canvas>
 <div id="labels" aria-hidden="true"></div>
 <div id="compass" class="ui" aria-label="Compass: north arrow"><svg viewBox="-50 -50 100 100" width="84" height="84"><circle r="46" fill="rgba(14,18,22,.72)" stroke="rgba(231,222,200,.45)" stroke-width="1.5"/><g id="rose"><g stroke="rgba(231,222,200,.55)" stroke-width="1.2"><path d="M0-46V-40M0 46V40M-46 0H-40M46 0H40"/></g><path d="M0-36L8 0H-8Z" fill="#e5503f"/><path d="M0 36L8 0H-8Z" fill="#d8d2c2"/><circle r="2.6" fill="#14181c" stroke="#f4efe2" stroke-width="1"/><text y="-26.5" x="0" text-anchor="middle" font-family="IBM Plex Sans,system-ui,sans-serif" font-size="12" font-weight="700" fill="#fff" stroke="#14181c" stroke-width=".8" paint-order="stroke">N</text><text y="34.5" x="0" text-anchor="middle" font-family="IBM Plex Sans,system-ui,sans-serif" font-size="8.5" font-weight="600" fill="#cdc6b4">S</text><text x="-31" y="3" text-anchor="middle" font-family="IBM Plex Sans,system-ui,sans-serif" font-size="8.5" font-weight="600" fill="#cdc6b4">W</text><text x="31" y="3" text-anchor="middle" font-family="IBM Plex Sans,system-ui,sans-serif" font-size="8.5" font-weight="600" fill="#cdc6b4">E</text></g></svg></div>
-<div id="tip" role="tooltip"></div>
+
 <div id="head" class="ui">
   <div><h1>Roundknoll Farm<span id="mode">Tabletop</span></h1><p class="sub">Baldwin, Maryland · 1957 landscape, the subdivision plats, and today</p></div>
   <div class="hbtns"><div class="seg" id="tabs" role="tablist" aria-label="View"><button id="tab3d" role="tab" aria-pressed="true">Tabletop</button><button id="tabown" role="tab" aria-pressed="false">Owner history</button></div><button id="babout" class="btn">About the farm</button><button id="bhelp" aria-label="Controls and notes" title="Controls and notes">?</button></div>
@@ -163,8 +159,6 @@ body.own #foot,body.own #labels,body.own #rside,body.own #head .sub,body.own #co
     <label><input id="ctrees" type="checkbox" checked> Trees</label>
     <label><input id="cbld" type="checkbox" checked> Buildings</label>
     <label><input id="cdate" type="checkbox" checked> House dates</label>
-    <label title="Thin drifting cloud wisps above the table, with soft shadows on the ground"><input id="cclouds" type="checkbox" checked> Clouds</label>
-    <label title="Cars on the roads, workers at houses going up, cows in the 1950s pasture, birds overhead (all exaggerated in size)"><input id="canim" type="checkbox" checked> Life: cars, workers, cows, birds</label>
     <div class="grp">Height</div>
     <label>Scale <input id="vex" type="range" min="1" max="3" step="0.1" value="1.5" style="width:110px;accent-color:var(--accent)"> <output id="vexo" style="min-width:3.2em;color:var(--fg)">1.5×</output></label>
   </div>
@@ -189,20 +183,20 @@ body.own #foot,body.own #labels,body.own #rside,body.own #head .sub,body.own #co
 <div id="status" class="ui"><b>Loading terrain</b><span id="st">0%</span></div>
 <div id="foot" class="ui">
   <div id="sl"><div id="dlab"></div><input id="blend" type="range" min="0" max="1" step="0.0025" value="0" aria-label="Timeline"><div id="ticks"></div></div>
-  <div class="frow"><div class="seg" id="stops" role="group" aria-label="Timeline stops"></div><button id="bvr" class="btn" hidden>Enter VR</button><button id="bar" class="btn" hidden>Passthrough</button></div>
+  <div class="frow"><div class="seg" id="stops" role="group" aria-label="Timeline stops"></div><button id="bvr" class="btn" hidden>Enter VR</button><div id="evbox" aria-live="polite"></div><button id="bar" class="btn" hidden>Passthrough</button></div>
   <div id="legend"></div>
   <div id="yrnote" class="sub"></div>
 </div>
 <div id="help" class="modal" hidden role="dialog" aria-modal="true" aria-label="Controls and notes"><div class="mcard"><button class="mx" data-close aria-label="Close">×</button>
   <h2>Controls</h2>
-  <ul><li><b>Orbit</b>: drag</li><li><b>Zoom</b>: scroll or pinch</li><li><b>Pan</b>: right-drag, or two fingers</li><li><b>Timeline</b>: drag the slider, or tap a year under it</li><li><b>Layers</b>: the window at the top right. Its Scale slider stretches the model vertically (1× is true scale).</li><li><b>Tabletop / Owner history</b>: the switch at the top right of the title box</li><li><b>Timeline events</b>: hover (or tap) a gold diamond under the slider to see what happened then; click it to jump there</li><li><b>Compass</b>: bottom left, always points to true north as you orbit</li></ul>
+  <ul><li><b>Orbit</b>: drag</li><li><b>Zoom</b>: scroll or pinch</li><li><b>Pan</b>: right-drag, or two fingers</li><li><b>Timeline</b>: drag the slider, or tap a year under it</li><li><b>Layers</b>: the window at the top right. Its Scale slider stretches the model vertically (1× is true scale).</li><li><b>Tabletop / Owner history</b>: the switch at the top right of the title box</li><li><b>Timeline events</b>: what happened at each date is described at the right of the timeline box</li><li><b>Compass</b>: bottom left, always points to true north as you orbit</li></ul>
   <h3>In the headset</h3>
   <ul><li><b>Trigger</b>: step to the next year</li><li><b>Grip</b>: toggle true scale</li><li><b>Thumbstick</b>: spin the table</li></ul>
   <p id="xrmsg" style="color:#f2cdbd"></p>
   <h3>How the model is built</h3>
   <p>The timeline steps through the recorded subdivision plats, drawn over the 1957 landscape. From 1961 on, today’s houses appear in the year the county records say they were built (Maryland SDAT year built, matched by street address; a few outbuildings take their house’s year). The Section 1 and Section 2 plat lines share one colour.</p>
   <p>The ground photo fades from the 1957 aerial to the 1964 and then the 1971 aerials (each covers the middle of the map; the edges keep the older photo). The terrain changes patch by patch: each lot switches from the 1957 surface to today’s lidar in the year before its house was built, and the roads are cut in the year after their plat was approved (1962, 1966, 1968, 1973), ahead of the houses. The 2023 aerial replaces the older photos on the regraded patches after 1972, starting in black and white to match the older prints.</p>
-  <p><b>Layers.</b> “Colourise photos” gives the old photos an estimated colour borrowed from today’s aerial (interpretive, not original). “All plats over today” draws every plat at once over the current ground. “Original plat prints” drapes the recorded plat sheets (Sections 1 to 3 together) over the ground, warped to fit the map. “Farm boundary” outlines the whole farm (the two 1881 lots together, as fitted to the 1957 aerial). “Life” adds small moving cars, workers, cows and birds; they are drawn several times life size so you can see them, and they are for atmosphere, not a record of what was there. “Raw lidar” is a hillshade of the Baltimore County lidar surface, trees and roofs included. “Topographic contours” are drawn from the same lidar every 5 ft (heavier every 25 ft), and show the 1957 ground’s contours before it was regraded.</p>
+  <p><b>Layers.</b> “Colourise photos” gives the old photos an estimated colour borrowed from today’s aerial (interpretive, not original). “All plats over today” draws every plat at once over the current ground. “Original plat prints” drapes the recorded plat sheets (Sections 1 to 3 together) over the ground, warped to fit the map. “Farm boundary” outlines the whole farm (the two 1881 lots together, as fitted to the 1957 aerial). “Raw lidar” is a hillshade of the Baltimore County lidar surface, trees and roofs included. “Topographic contours” are drawn from the same lidar every 5 ft (heavier every 25 ft), and show the 1957 ground’s contours before it was regraded.</p>
   <p><b>Quality settings</b> (top right, under Layers). “Larger textures” and “AI-enhanced aerials” load 4096 px copies of the four aerials; the AI version is upscaled with Real-ESRGAN and adds plausible detail that is not in the original photos. “Sharpen aerials” applies an unsharp mask. “Finer terrain mesh” uses an 800 × 800 ground grid built from the 1 m lidar. “Lidar-placed trees” puts a tree at each crown found in the lidar canopy model (about 6,800), coloured from the 2023 aerial; “Detailed tree shapes” swaps the simple blobs and cones for lobed crowns and layered conifers. The last three are heavier, so turn them off if the headset or your computer struggles.</p>
   <p>Terrain is lidar from 2014 with later regrading removed for 1957. Trees and farm buildings in 1957 are drafted from the aerial photo and are approximate.</p>
 </div></div>
@@ -350,29 +344,6 @@ try {
       }` }));
   sky.renderOrder = -10; scene.add(sky);
   // thin drifting cloud wisps floating just above the table: two layers at different heights and speeds, so they slide past each other as you orbit
-  const uCl = { value: 0 };
-  // one cloud-density function shared by the cloud sheets and by the ground shader (so each cloud throws a soft shadow)
-  const CLOUD_FN = `
-    float chash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-    float cvn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
-      return mix(mix(chash(i), chash(i+vec2(1,0)), f.x), mix(chash(i+vec2(0,1)), chash(i+vec2(1,1)), f.x), f.y); }
-    float cfbm(vec2 p){ float a = 0.5, s = 0.0; for(int i = 0; i < 4; i++){ s += a * cvn(p); p = p * 2.03 + 11.7; a *= 0.5; } return s; }
-    float cloudD(vec2 uv, float t, float seed, float scl, vec2 wnd){
-      vec2 p = (uv + seed) * vec2(2.2, 4.2) * scl + wnd * t;
-      vec2 q = vec2(cfbm(p + vec2(0.0, t * 0.012)), cfbm(p + vec2(5.2, 1.3) - t * 0.01));
-      float n = cfbm(p + 1.9 * q);
-      float c = smoothstep(0.40, 0.74, n) * smoothstep(0.18, 0.62, cfbm(p * 0.45 + q));
-      return c * (1.0 - smoothstep(0.30, 0.50, length(uv - 0.5)));
-    }`;
-  const CLOUDS = [{ y: 0.10, size: 1.6, seed: 0.0, scale: 1.0, wind: [0.016, 0.006], alpha: 0.6 }, { y: 0.17, size: 1.8, seed: 3.7, scale: 0.8, wind: [0.024, -0.005], alpha: 0.5 }, { y: 0.26, size: 2.0, seed: 8.1, scale: 0.65, wind: [0.011, 0.009], alpha: 0.38 }];
-  const cloudFrag = `uniform float uTime; uniform float uSeed; uniform float uScale; uniform vec2 uWind; uniform float uAlpha; varying vec2 vUv;` + CLOUD_FN + `
-    void main(){ float d = cloudD(vUv, uTime, uSeed, uScale, uWind); gl_FragColor = vec4(1.0, 1.0, 1.0, min(d * 1.15, 1.0) * uAlpha); }`;
-  const clouds = CLOUDS.map(c => {
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(c.size, c.size).rotateX(-Math.PI / 2), new THREE.ShaderMaterial({ transparent: true, depthWrite: false, fog: false, side: THREE.DoubleSide,
-      uniforms: { uTime: uCl, uSeed: { value: c.seed }, uScale: { value: c.scale }, uWind: { value: new THREE.Vector2(c.wind[0], c.wind[1]) }, uAlpha: { value: c.alpha } },
-      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }', fragmentShader: cloudFrag }));
-    m.position.y = c.y; m.renderOrder = 5; m.frustumCulled = false; rig.add(m); return m; });
-  const cloudsCb = $('cclouds'), uClS = { value: 1 };
   const vert = `
     uniform float uT; uniform float uBot; uniform float uEx; uniform float uYr; uniform float uA; uniform float uB; attribute float h0; attribute float h1; attribute float top; attribute float gy; attribute float rd; attribute float rq; attribute vec3 n0; attribute vec3 n1;
     varying vec2 vUv; varying vec3 vN; varying float vWc;
@@ -384,9 +355,8 @@ try {
       float h = top > 0.5 ? mix(h0, h1, w) : -uBot;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position.x, h, position.z, 1.0); }`;
   const frag = `
-    uniform float uT; uniform sampler2D t57; uniform sampler2D t64; uniform sampler2D t71; uniform float uA; uniform float uB; uniform sampler2D t23; uniform sampler2D tPA; uniform sampler2D tPB; uniform vec4 uPl; uniform vec3 uL; uniform float uSkirt; uniform sampler2D tG; uniform sampler2D tR; uniform sampler2D tL; uniform sampler2D tLt; uniform float uLots; uniform float uYr; uniform float uCol; uniform float uSat; uniform float uOne; uniform sampler2D tLid; uniform sampler2D tTopo; uniform sampler2D tPrA; uniform float uLid; uniform float uTopo; uniform vec4 uPr; uniform float uSharp; uniform sampler2D tBnd; uniform float uBnd; uniform float uClT; uniform float uClS;
+    uniform float uT; uniform sampler2D t57; uniform sampler2D t64; uniform sampler2D t71; uniform float uA; uniform float uB; uniform sampler2D t23; uniform sampler2D tPA; uniform sampler2D tPB; uniform vec4 uPl; uniform vec3 uL; uniform float uSkirt; uniform sampler2D tG; uniform sampler2D tR; uniform sampler2D tL; uniform sampler2D tLt; uniform float uLots; uniform float uYr; uniform float uCol; uniform float uSat; uniform float uOne; uniform sampler2D tLid; uniform sampler2D tTopo; uniform sampler2D tPrA; uniform float uLid; uniform float uTopo; uniform vec4 uPr; uniform float uSharp; uniform sampler2D tBnd; uniform float uBnd;
     varying vec2 vUv; varying vec3 vN; varying float vWc;
-    ${CLOUD_FN}
     vec3 sheet(vec3 col, float v, float a){ float cov = smoothstep(0.0, 0.006, v), ink = clamp((v - 0.0039) / 0.996, 0.0, 1.0); return mix(col, mix(vec3(0.75, 0.70, 0.55), vec3(0.02, 0.018, 0.015), ink), cov * a * 0.86); }
     void main(){ float nd = max(dot(normalize(vN), uL), 0.0); float lit = 0.42 + 0.68 * nd;
       vec4 rr = texture2D(tR, vUv); float rt = rr.r * smoothstep(1965.30 + rr.g * 0.45, 1965.50 + rr.g * 0.45, uYr);
@@ -422,17 +392,11 @@ try {
         col = mix(col, vec3(1.0, 0.93, 0.35), texture2D(tBnd, vUv).r * uBnd * 0.95);   // whole-farm outline
         if (uOne > 0.5) col = mix(base0, vec3(1.0, 0.85, 0.1), max(max(m1, m2), max(m3, m4)) * 0.95);   // composite plat: one colour
       }
-      if (uClS > 0.0 && uSkirt < 0.5) {   // soft shadows of the drifting clouds (same noise as the cloud sheets, shifted along the sun direction)
-        vec2 wp = vec2(vUv.x - 0.5, 0.5 - vUv.y) * 0.8; vec2 sd = uL.xz / max(uL.y, 0.2);
-        vec2 u1 = (wp + sd * 0.10) / 1.6 + 0.5, u2 = (wp + sd * 0.17) / 1.8 + 0.5; u1.y = 1.0 - u1.y + 0.0; u2.y = 1.0 - u2.y + 0.0;
-        float sh = clamp(cloudD(u1, uClT, 0.0, 1.0, vec2(0.016, 0.006)) * 0.78 + cloudD(u2, uClT, 3.7, 0.8, vec2(0.024, -0.005)) * 0.62, 0.0, 1.0);
-        col *= 1.0 - 0.30 * sh * uClS;
-      }
       gl_FragColor = vec4(col, 1.0);
       #include <colorspace_fragment>
     }`;
   const mkMat = skirt => new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: frag, side: THREE.DoubleSide,
-    uniforms: { uClT: uCl, uClS, tBnd: { value: tBnd }, uBnd, uT, uYr, uEx, uPl, uBot: { value: BOT * VEX }, t57: { value: t57 }, t64: { value: t64 }, t71: { value: t71 }, uA, uB, t23: { value: t23 }, tPA: { value: tPA }, tPB: { value: tPB }, tG: { value: tG }, tR: { value: tR }, tL: { value: tL }, tLt: { value: tLt }, uLots, uCol, uSat, uOne, tLid: { value: tLid }, tTopo: { value: tTopo }, tPrA: { value: tPrA }, uLid, uTopo, uPr, uSharp, uL: { value: LIGHT }, uSkirt: { value: skirt ? 1 : 0 } } });
+    uniforms: { tBnd: { value: tBnd }, uBnd, uT, uYr, uEx, uPl, uBot: { value: BOT * VEX }, t57: { value: t57 }, t64: { value: t64 }, t71: { value: t71 }, uA, uB, t23: { value: t23 }, tPA: { value: tPA }, tPB: { value: tPB }, tG: { value: tG }, tR: { value: tR }, tL: { value: tL }, tLt: { value: tLt }, uLots, uCol, uSat, uOne, tLid: { value: tLid }, tTopo: { value: tTopo }, tPrA: { value: tPrA }, uLid, uTopo, uPr, uSharp, uL: { value: LIGHT }, uSkirt: { value: skirt ? 1 : 0 } } });
 
   const matT = mkMat(false), matS = mkMat(true), mats = [matT, matS];
   let terrain = null, skirtMesh = null;
@@ -629,14 +593,8 @@ float nn = n3(vOP * 7.0) * 0.6 + n3(vOP * 17.0) * 0.4; diffuseColor.rgb *= 0.55 
     [1975.49, 'Farmhouse lot sold', 'J. Thomas Requard sells Lot 3, Block C, Section 2, the old farmhouse lot (4305 Roundnoll Rd), to Ronald and Victoria Lessa (26 June 1975).'],
     [1977.62, 'New owner', 'Jean D. Crockett buys the farmhouse lot (12 August 1977) and keeps it for 37 years.']
   ];
-  const tip = $('tip'), ticksEl = $('ticks');
-  const hideTip = () => { tip.style.display = 'none'; };
-  TLE.forEach(([ty, tt, tb]) => { const b = document.createElement('button'); b.className = 'tle'; b.style.left = posCss(sOfYear(ty)); b.setAttribute('aria-label', fmtDate(ty) + ': ' + tt);
-    const show = () => { tip.innerHTML = '<b>' + tt + '</b><small>' + fmtDate(ty) + '</small>' + tb; tip.style.display = 'block'; const r = b.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
-      tip.style.left = Math.max(8, Math.min(innerWidth - tw - 8, r.left + r.width / 2 - tw / 2)) + 'px'; tip.style.top = Math.max(8, r.top - th - 12) + 'px'; };
-    b.onmouseenter = show; b.onfocus = show; b.onmouseleave = hideTip; b.onblur = hideTip;
-    b.onclick = () => { show(); s = target = sOfYear(ty + 0.01); $('blend').value = s; }; ticksEl.appendChild(b); });
-  const eventNow = yr => { let e = null; for (const x of TLE) if (yr >= x[0] && yr < x[0] + 0.45) e = x; return e; };
+  const evBox = $('evbox');
+  const eventNow = yr => { let e = null; for (const x of TLE) if (yr >= x[0]) e = x; return e; };
   const refresh = () => {
     t = ss(clamp01((s - 0.8) / 0.2));
     uT.value = t; uA.value = ss(clamp01((s - 0.09) / 0.06)); uB.value = ss(clamp01((yearAt(s) - 1968.5) / 2.5));   // the 1971 photo is fully in by 1971
@@ -647,10 +605,10 @@ float nn = n3(vOP * 7.0) * 0.6 + n3(vOP * 17.0) * 0.4; diffuseColor.rgb *= 0.55 
     uCol.value = colOn.checked ? 1 : 0; uLots.value = lotsCb.checked ? 1 : 0; uSat.value = ss(clamp01((yearAt(s) - 1975) / 14));
     uPl.value.set(a[0], a[1], a[2], a[3]);
     const onP = prCb.checked ? fade : 0, ap = [onP, 0, 0, 0];
-    uPr.value.set(onP, 0, 0, 0); uLid.value = lidCb.checked ? 1 : 0; uBnd.value = bndCb.checked ? 1 : 0; uClS.value = cloudsCb.checked ? 1 : 0; uTopo.value = topoCb.checked ? 1 : 0;
+    uPr.value.set(onP, 0, 0, 0); uLid.value = lidCb.checked ? 1 : 0; uBnd.value = bndCb.checked ? 1 : 0; uTopo.value = topoCb.checked ? 1 : 0;
     const f23 = ss(clamp01((t - 0.25) / 0.6)), f57 = ss(clamp01((0.75 - t) / 0.6));
     const yr = yearAt(s); uYr.value = yr; $('dlab').textContent = fmtDate(yr); $('dlab').style.left = posCss(s); placeTrees(tr57, f57, t, yr); placeTrees(tr23, f23, t, yr); placeBlds(bl57, f57, t, yr); placeBlds(bl23, f23, t, yr);
-    const evn = eventNow(yr); $('yrnote').textContent = true ? fmtDate(yr) + (evn ? ' · ' + evn[1] : '') + ' · ' + yrTimes.filter(y => y <= yr).length + ' of ' + yrTimes.length + ' homes with a county year-built are standing · ground: ' + (s > 0.97 ? 'today’s aerial photo' : (uB.value > 0.5 ? '1971' : uA.value > 0.5 ? '1964' : '1957') + ' aerial photo') : '';
+    const evn = eventNow(yr); evBox.innerHTML = evn ? '<b>' + evn[1] + '</b><small>' + fmtDate(evn[0]) + '</small>' + evn[2] : ''; $('yrnote').textContent = true ? fmtDate(yr) + ' · ' + yrTimes.filter(y => y <= yr).length + ' of ' + yrTimes.length + ' homes with a county year-built are standing · ground: ' + (s > 0.97 ? 'today’s aerial photo' : (uB.value > 0.5 ? '1971' : uA.value > 0.5 ? '1964' : '1957') + ' aerial photo') : '';
     for (const T of [tr57, tr23]) for (const m of [T.mB, T.mC, T.mT]) m.visible &&= showTrees.checked;
     for (const b of [...bl57, ...bl23]) b.mesh.visible &&= showBld.checked;
     const n = nearest();
@@ -920,101 +878,6 @@ return mount;})();
   addEventListener('resize', resize); resize();
   refresh(); statusBox.style.display = 'none';
 
-  // ---------- life: cars, workers, cows and birds (drawn several times life size so they show at tabletop scale) ----------
-  const animCb = $('canim');
-  const life = { cars: null, cows: null, workers: null, birds: [], flock: [] };
-  try {
-    const box = (w, h, d, x, y, z, c) => { const g = new THREE.BoxGeometry(w, h, d).translate(x, y, z); const n = g.attributes.position.count, col = new Float32Array(n * 3); for (let i = 0; i < n; i++) { col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2]; } g.setAttribute('color', new THREE.BufferAttribute(col, 3)); return g.toNonIndexed(); };
-    const mk = (geos, n) => { const m = new THREE.InstancedMesh(mergeGeometries(geos.map(g => g.index ? g.toNonIndexed() : g)), new THREE.MeshLambertMaterial({ vertexColors: true }), n); m.frustumCulled = false; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); m.count = 0; world.add(m);
-      m.setColorAt(0, new THREE.Color(1, 1, 1)); return m; };
-    const carG = [box(4.4, 0.8, 1.8, 0, 0.7, 0, [1, 1, 1]), box(2.3, 0.75, 1.6, -0.3, 1.45, 0, [0.22, 0.27, 0.32]), ...[[1.4, 0.9], [1.4, -0.9], [-1.4, 0.9], [-1.4, -0.9]].map(([x, z]) => box(0.8, 0.8, 0.35, x, 0.4, z, [0.07, 0.07, 0.07]))];
-    const cowG = [box(2.4, 1.1, 0.9, 0, 1.15, 0, [1, 1, 1]), box(0.75, 0.55, 0.5, 1.5, 1.35, 0, [1, 1, 1]), ...[[0.9, 0.3], [0.9, -0.3], [-0.9, 0.3], [-0.9, -0.3]].map(([x, z]) => box(0.2, 0.8, 0.2, x, 0.4, z, [0.35, 0.3, 0.28]))];
-    const wkG = [box(0.34, 0.85, 0.3, 0, 0.42, 0, [0.2, 0.26, 0.4]), box(0.55, 0.7, 0.36, 0, 1.2, 0, [1, 0.5, 0.08]), box(0.3, 0.3, 0.3, 0, 1.72, 0, [0.85, 0.65, 0.5]), box(0.36, 0.14, 0.36, 0, 1.95, 0, [1, 0.85, 0.1])];
-    life.cars = mk(carG, 12); life.cows = mk(cowG, 10); life.workers = mk(wkG, 18);
-    const CAR_S = 3.2, COW_S = 3.4, WK_S = 4.2;
-    const rnd = (a, b) => a + Math.random() * (b - a);
-    const gY = (px, py) => { const g = gyAt(px, py), w = wLocal(g, uYr.value, uT.value); return hAt(0, px, py) * (1 - w) + hAt(1, px, py) * w; };
-    const M4 = new THREE.Matrix4(), Q = new THREE.Quaternion(), V3 = new THREE.Vector3(), S3 = new THREE.Vector3(), YA = new THREE.Vector3(0, 1, 0), COL = new THREE.Color();
-    const put = (mesh, i, px, py, ang, sc, lift) => { V3.set(wx(px), gY(px, py) + lift, wz(py)); Q.setFromAxisAngle(YA, -ang); S3.setScalar(sc); M4.compose(V3, Q, S3); mesh.setMatrixAt(i, M4); };
-    // --- cows: a small herd grazing the big pasture south-east of the farmhouse until the farm is sold (1959) ---
-    const COWC = [940, 1240], COWR = [100, 88], cows = [];
-    const cowCols = [[0.08, 0.08, 0.08], [0.9, 0.9, 0.88], [0.4, 0.25, 0.14], [0.12, 0.1, 0.1], [0.85, 0.82, 0.78]];
-    for (let i = 0; i < 9; i++) { const a = rnd(0, 6.28), r = Math.sqrt(Math.random()); cows.push({ x: COWC[0] + Math.cos(a) * COWR[0] * r, y: COWC[1] + Math.sin(a) * COWR[1] * r, h: rnd(0, 6.28), sp: 0, wait: rnd(0, 6) }); life.cows.setColorAt(i, COL.setRGB(...cowCols[i % cowCols.length])); }
-    // --- cars: along the real road centrelines (OpenStreetMap), Sweet Air Road always, the subdivision roads once they are built ---
-    let routes = null; try { routes = await get('routes.json', 'json'); } catch (e) { console.warn('no routes', e); }
-    const prep = pts => { const c = []; for (const p of pts) { if (p[0] < -30 || p[0] > 1830 || p[1] < -30 || p[1] > 1830) { if (c.length > 1) break; if (c.length === 0) continue; } c.push(p); } const cum = [0]; for (let i = 1; i < c.length; i++) cum.push(cum[i - 1] + Math.hypot(c[i][0] - c[i - 1][0], c[i][1] - c[i - 1][1])); return { pts: c, cum, len: cum[cum.length - 1] }; };
-    const ROUTES = routes ? { sweet: prep(routes.sweet), sub: Object.entries(routes.sub).map(([k, r]) => ({ k, from: r.from, ...prep(r.pts) })) } : null;
-    const sampleRoute = (R, d) => { const c = R.cum; let i = 1; while (i < c.length - 1 && c[i] < d) i++; const f = (d - c[i - 1]) / Math.max(c[i] - c[i - 1], 1e-6), a = R.pts[i - 1], b = R.pts[i]; return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, Math.atan2(b[1] - a[1], b[0] - a[0])]; };
-    const carCols = [[0.75, 0.1, 0.1], [0.1, 0.25, 0.55], [0.85, 0.82, 0.7], [0.15, 0.4, 0.25], [0.5, 0.5, 0.52], [0.9, 0.7, 0.15], [0.1, 0.1, 0.12]];
-    const cars = []; let carTimer = 2;
-    for (let i = 0; i < 12; i++) { cars.push({ on: false, R: null, d: 0, dir: 1, sp: 0, wait: 0, turn: false, ang: 0 }); life.cars.setColorAt(i, COL.setRGB(...carCols[i % carCols.length])); }
-    const houseCount = yr => { let n = 0; for (const y of yrTimes) if (y <= yr) n++; return n; };
-    const spawnCar = (c, yr) => {
-      const subs = ROUTES.sub.filter(r => yr >= r.from && r.len > 50), n = houseCount(yr);
-      const useSub = subs.length && yr > 1965.9 && Math.random() < Math.min(0.75, 0.25 + n / 120);
-      if (useSub) { c.R = subs[(Math.random() * subs.length) | 0]; c.dir = 1; c.sub = true; } else { c.R = ROUTES.sweet; c.dir = Math.random() < 0.5 ? 1 : -1; c.sub = false; }
-      c.d = c.dir > 0 ? 0 : c.R.len; c.sp = rnd(85, 130); c.wait = 0; c.turn = false; c.on = true; };
-    // --- workers: pacing around each house in the months before it is finished ---
-    const wk = []; for (let i = 0; i < 18; i++) { wk.push({ ph: rnd(0, 6.28), sp: rnd(0.5, 1.1), r: rnd(9, 17), dir: rnd(0, 3.14) }); }
-    // --- birds: a few circling hawks and an occasional skein of geese, flying in the air above the table ---
-    const birdMat = new THREE.MeshBasicMaterial({ color: 0x1a1c20, side: THREE.DoubleSide });
-    const wingGeo = new THREE.BufferGeometry(); wingGeo.setAttribute('position', new THREE.Float32BufferAttribute([0.15, 0, 0.05, -0.35, 0, 1.0, -0.6, 0, 0.05, 0.15, 0, 0.05, -0.6, 0, 0.05, -0.2, 0, -0.1], 3)); wingGeo.computeVertexNormals();
-    const bodyGeo = new THREE.BufferGeometry(); bodyGeo.setAttribute('position', new THREE.Float32BufferAttribute([0.55, 0, 0, -0.45, 0, 0.13, -0.45, 0, -0.13], 3));
-    const mkBird = sc => { const g = new THREE.Group(), wr = new THREE.Mesh(wingGeo, birdMat), wl = new THREE.Mesh(wingGeo, birdMat); wl.scale.z = -1; g.add(new THREE.Mesh(bodyGeo, birdMat), wr, wl); g.scale.setScalar(sc); g.visible = false; rig.add(g); return { g, wr, wl, ph: rnd(0, 6.28) }; };
-    const flap = (b, now, k) => { const a = Math.sin(now * k + b.ph) * 0.65; b.wr.rotation.x = a; b.wl.rotation.x = -a; };
-    for (let i = 0; i < 6; i++) { const b = mkBird(rnd(0.012, 0.017)); b.cx = rnd(-0.22, 0.22); b.cz = rnd(-0.22, 0.22); b.R = rnd(0.1, 0.3); b.y = rnd(0.12, 0.3); b.w = rnd(0.16, 0.3) * (Math.random() < 0.5 ? -1 : 1); b.a = rnd(0, 6.28); b.bob = rnd(0, 6.28); life.birds.push(b); }
-    for (let i = 0; i < 7; i++) life.flock.push(mkBird(0.015));
-    const flockState = { on: false, t: 0, next: 10, x0: 0, z0: 0, dx: 0, dz: 0, y: 0.34 };
-    let wasAnim = true;
-    life.update = (now, dt) => {
-      const on = animCb.checked, yr = uYr.value, tt = uT.value, T = now / 1000;
-      if (!on) { if (wasAnim) { life.cars.count = life.cows.count = life.workers.count = 0; for (const b of [...life.birds, ...life.flock]) b.g.visible = false; wasAnim = false; } return; }
-      wasAnim = true;
-      // cows
-      const cowVis = (1 - clamp01((yr - 1959.4) / 0.8)) * (tt < 0.02 ? 1 : 0);
-      life.cows.count = cowVis > 0.02 ? cows.length : 0;
-      if (life.cows.count) { cows.forEach((c, i) => { c.wait -= dt;
-          if (c.wait <= 0) { if (c.sp > 0) { c.sp = 0; c.wait = rnd(3, 9); } else { c.sp = rnd(2.5, 5); c.wait = rnd(2, 6); c.h += rnd(-1.2, 1.2); } }
-          const ex = (c.x - COWC[0]) / COWR[0], ey = (c.y - COWC[1]) / COWR[1]; if (ex * ex + ey * ey > 1) c.h = Math.atan2(COWC[1] - c.y, COWC[0] - c.x) + rnd(-0.4, 0.4);
-          c.x += Math.cos(c.h) * c.sp * dt / 0.55; c.y += Math.sin(c.h) * c.sp * dt / 0.55;
-          put(life.cows, i, c.x, c.y, c.h, COW_S * cowVis, 0.2); });
-        life.cows.instanceMatrix.needsUpdate = true; if (life.cows.instanceColor) life.cows.instanceColor.needsUpdate = true; }
-      // cars
-      if (ROUTES) {
-        const sub = yr > 1965.9 ? Math.min(5, 1 + Math.floor(houseCount(yr) / 14)) : 0, want = (yr < 1964 ? 1 : 2) + sub + (tt > 0.5 ? 1 : 0);
-        let act = 0; for (const c of cars) if (c.on) act++;
-        carTimer -= dt; if (carTimer <= 0 && act < want) { const c = cars.find(c => !c.on); if (c) spawnCar(c, yr); carTimer = rnd(1.5, 5); }
-        let n = 0;
-        cars.forEach((c, i) => { if (!c.on) return;
-          if (c.wait > 0) { c.wait -= dt; if (c.wait <= 0) { c.dir = -1; c.turn = true; } }
-          else { c.d += c.dir * c.sp * dt; if (c.dir > 0 && c.d >= c.R.len) { if (c.sub) { c.d = c.R.len; c.wait = rnd(3, 9); } else c.on = false; } else if (c.dir < 0 && c.d <= 0) c.on = false; }
-          if (!c.on) return;
-          const [px, py, a] = sampleRoute(c.R, Math.min(Math.max(c.d, 0), c.R.len)), edge = Math.min(px, py, 1799 - px, 1799 - py), sc = clamp01(edge / 40);
-          if (sc <= 0.01) return;
-          put(life.cars, n, px + Math.sin(a) * -3 * 0, py, a + (c.dir < 0 ? Math.PI : 0), CAR_S * sc, 0.25);
-          life.cars.setColorAt(n, COL.setRGB(...carCols[i % carCols.length])); n++; });
-        life.cars.count = n; life.cars.instanceMatrix.needsUpdate = true; if (life.cars.instanceColor) life.cars.instanceColor.needsUpdate = true;
-      }
-      // workers at houses going up
-      let nw = 0;
-      if (tt < 0.6) for (const B of bl23) { if (!B.y || nw >= wk.length - 2) continue; const k = yr - B.y; if (k < -0.7 || k > 0.1) continue;
-        const cx = B.lx, cz = B.lz, gy = B.mesh.position.y; const cnt = 3;
-        for (let j = 0; j < cnt && nw < wk.length; j++) { const w = wk[nw], ph = T * w.sp + w.ph, r = w.r * (0.6 + 0.4 * Math.sin(ph * 0.5)), px = cx + Math.cos(w.dir + j * 2.1) * r * Math.sin(ph), pz = cz + Math.sin(w.dir + j * 2.1) * r * Math.sin(ph);
-          const fa = Math.atan2(Math.sin(w.dir + j * 2.1) * Math.cos(ph) * Math.sign(1), Math.cos(w.dir + j * 2.1) * Math.cos(ph));
-          V3.set(px, gy + 0.2, pz); Q.setFromAxisAngle(YA, -fa); S3.setScalar(WK_S * clamp01((0.7 + k) * 8)); M4.compose(V3, Q, S3); life.workers.setMatrixAt(nw, M4); nw++; } }
-      life.workers.count = nw; life.workers.instanceMatrix.needsUpdate = true;
-      // birds
-      const camBirds = true;
-      for (const b of life.birds) { b.a += b.w * dt / b.R * 0.1; b.g.visible = camBirds; const ang = b.a; b.g.position.set(b.cx + Math.cos(ang) * b.R, b.y + Math.sin(T * 0.4 + b.bob) * 0.015, b.cz + Math.sin(ang) * b.R);
-        b.g.rotation.y = -(ang + Math.sign(b.w) * Math.PI / 2); b.g.rotation.z = Math.sign(b.w) * -0.25; flap(b, T, 7); }
-      const F = flockState; F.next -= dt;
-      if (!F.on && F.next <= 0) { F.on = true; F.t = 0; const a = rnd(0, 6.28); F.x0 = -Math.cos(a) * 0.95; F.z0 = -Math.sin(a) * 0.95; F.dx = Math.cos(a); F.dz = Math.sin(a); F.y = rnd(0.28, 0.42); }
-      if (F.on) { F.t += dt; const d = F.t * 0.11 + 0, fa = Math.atan2(F.dz, F.dx);
-        life.flock.forEach((b, i) => { const row = i === 0 ? 0 : Math.ceil(i / 2), side = i === 0 ? 0 : (i % 2 ? 1 : -1), px = F.x0 + F.dx * d - F.dx * row * 0.07 - F.dz * side * row * 0.05, pz = F.z0 + F.dz * d - F.dz * row * 0.07 + F.dx * side * row * 0.05;
-          b.g.visible = true; b.g.position.set(px, F.y + Math.sin(T * 1.3 + i) * 0.006, pz); b.g.rotation.set(0, -fa, 0); flap(b, T, 5.5); });
-        if (d > 1.95) { F.on = false; F.next = rnd(35, 80); for (const b of life.flock) b.g.visible = false; } }
-    };
-  } catch (e) { console.error('life', e); }
   // compass: the rose turns so north always points the right way on screen
   const roseEl = $('rose'), cf = new THREE.Vector3();
   const updCompass = () => { cf.subVectors(controls.target, camera.position); const ry = rig.rotation.y, nx = -Math.sin(ry), nz = -Math.cos(ry), l = Math.hypot(cf.x, cf.z) || 1, fx = cf.x / l, fz = cf.z / l;
@@ -1028,8 +891,7 @@ return mount;})();
     if (s !== shownS) refresh();
     if (inXR) { const s = renderer.xr.getSession(); for (const src of s.inputSources) { const a = src.gamepad && src.gamepad.axes; if (a && a.length >= 4 && Math.abs(a[2]) > 0.15) rig.rotation.y += a[2] * dt * 1.2; } }
     else controls.update();
-    uCl.value = now / 1000; for (const c of clouds) c.visible = cloudsCb.checked;
-    if (life.update) life.update(now, dt); updCompass();
+    updCompass();
     updateLabels();
     renderer.render(scene, camera);
   });
