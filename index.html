@@ -75,7 +75,9 @@ h1{margin:0;font:600 24px/1.15 var(--display);letter-spacing:.01em;color:#fff}
 #tabs{align-self:flex-start}
 body.own #foot,body.own #labels,body.own #rside,body.own #head .sub,body.own #compass{display:none!important}
 #evbox{flex:1 1 280px;margin-left:auto;max-width:520px;font-size:12.5px;line-height:1.4;color:var(--fg);border-left:3px solid var(--accent);padding:2px 0 2px 12px}#evbox:empty{display:none}#evbox b{display:block;font-size:13.5px;color:#fff}#evbox small{display:block;color:var(--accent);font-weight:600;margin:0 0 2px}
-#compass{left:max(16px,env(safe-area-inset-left,0px));bottom:150px;width:84px;height:84px;pointer-events:none;filter:drop-shadow(0 2px 8px rgba(0,0,0,.55))}
+#compass{left:max(16px,env(safe-area-inset-left,0px));bottom:150px;width:96px;height:96px;pointer-events:none;perspective:340px}
+#compass svg{position:absolute;left:6px;top:6px;width:84px;height:84px;transform-origin:50% 50%}
+#cshadow{position:absolute;left:10px;top:10px;width:76px;height:76px;border-radius:50%;background:rgba(0,0,0,.55);filter:blur(7px);transform-origin:50% 50%}
 #own{position:fixed;left:0;right:0;bottom:0;top:var(--ownTop,110px);z-index:3;padding:0 max(14px,env(safe-area-inset-right,0px)) 14px max(14px,env(safe-area-inset-left,0px));pointer-events:none;box-sizing:border-box}
 #own[hidden]{display:none}
 #own .opanel{pointer-events:auto;height:100%;max-width:1320px;margin:0 auto;background:rgba(16,20,24,.92);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.45);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);overflow:hidden}
@@ -135,7 +137,7 @@ body.own #foot,body.own #labels,body.own #rside,body.own #head .sub,body.own #co
 
 <canvas id="stage" aria-label="3D tabletop model of the farm"></canvas>
 <div id="labels" aria-hidden="true"></div>
-<div id="compass" class="ui" aria-label="Compass: north arrow"><svg viewBox="-50 -50 100 100" width="84" height="84"><circle r="46" fill="rgba(14,18,22,.72)" stroke="rgba(231,222,200,.45)" stroke-width="1.5"/><g id="rose"><g stroke="rgba(231,222,200,.55)" stroke-width="1.2"><path d="M0-46V-40M0 46V40M-46 0H-40M46 0H40"/></g><path d="M0-36L8 0H-8Z" fill="#e5503f"/><path d="M0 36L8 0H-8Z" fill="#d8d2c2"/><circle r="2.6" fill="#14181c" stroke="#f4efe2" stroke-width="1"/><text y="-26.5" x="0" text-anchor="middle" font-family="IBM Plex Sans,system-ui,sans-serif" font-size="12" font-weight="700" fill="#fff" stroke="#14181c" stroke-width=".8" paint-order="stroke">N</text><text y="34.5" x="0" text-anchor="middle" font-family="IBM Plex Sans,system-ui,sans-serif" font-size="8.5" font-weight="600" fill="#cdc6b4">S</text><text x="-31" y="3" text-anchor="middle" font-family="IBM Plex Sans,system-ui,sans-serif" font-size="8.5" font-weight="600" fill="#cdc6b4">W</text><text x="31" y="3" text-anchor="middle" font-family="IBM Plex Sans,system-ui,sans-serif" font-size="8.5" font-weight="600" fill="#cdc6b4">E</text></g></svg></div>
+<div id="compass" class="ui" aria-label="Compass: north arrow"><div id="cshadow"></div><svg id="csvg" viewBox="-50 -50 100 100" width="84" height="84"><circle r="46" fill="rgba(14,18,22,.72)" stroke="rgba(231,222,200,.45)" stroke-width="1.5"/><g id="rose"><g stroke="rgba(231,222,200,.55)" stroke-width="1.2"><path d="M0-46V-40M0 46V40M-46 0H-40M46 0H40"/></g><path d="M0-36L8 0H-8Z" fill="#e5503f"/><path d="M0 36L8 0H-8Z" fill="#d8d2c2"/><circle r="2.6" fill="#14181c" stroke="#f4efe2" stroke-width="1"/><text y="-26.5" x="0" text-anchor="middle" font-family="IBM Plex Sans,system-ui,sans-serif" font-size="12" font-weight="700" fill="#fff" stroke="#14181c" stroke-width=".8" paint-order="stroke">N</text><text y="34.5" x="0" text-anchor="middle" font-family="IBM Plex Sans,system-ui,sans-serif" font-size="8.5" font-weight="600" fill="#cdc6b4">S</text><text x="-31" y="3" text-anchor="middle" font-family="IBM Plex Sans,system-ui,sans-serif" font-size="8.5" font-weight="600" fill="#cdc6b4">W</text><text x="31" y="3" text-anchor="middle" font-family="IBM Plex Sans,system-ui,sans-serif" font-size="8.5" font-weight="600" fill="#cdc6b4">E</text></g></svg></div>
 
 <div id="head" class="ui">
   <div><h1>Roundknoll Farm<span id="mode">Tabletop</span></h1><p class="sub">Baldwin, Maryland · 1957 landscape, the subdivision plats, and today</p></div>
@@ -881,6 +883,8 @@ return mount;})();
   // compass: the rose turns so north always points the right way on screen
   const roseEl = $('rose'), cf = new THREE.Vector3();
   const updCompass = () => { cf.subVectors(controls.target, camera.position); const ry = rig.rotation.y, nx = -Math.sin(ry), nz = -Math.cos(ry), l = Math.hypot(cf.x, cf.z) || 1, fx = cf.x / l, fz = cf.z / l;
+    const phi = Math.min(Math.acos(Math.min(Math.max((camera.position.y - controls.target.y) / (camera.position.distanceTo(controls.target) || 1), 0), 1)) * 180 / Math.PI, 84), lift = 14 * Math.sin(phi * Math.PI / 180);   // phi: how far the view is tipped from straight down
+    $('csvg').style.transform = 'translateY(' + (-lift).toFixed(1) + 'px) rotateX(' + phi.toFixed(1) + 'deg)'; $('cshadow').style.transform = 'translateY(' + (lift * 0.2).toFixed(1) + 'px) rotateX(' + phi.toFixed(1) + 'deg) scale(.94)';
     roseEl.setAttribute('transform', 'rotate(' + (Math.atan2(nx * -fz + nz * fx, nx * fx + nz * fz) * 180 / Math.PI).toFixed(1) + ')'); };
   const footEl = $('foot'), compassEl = $('compass'), placeCompass = () => { compassEl.style.bottom = (footEl.offsetHeight + 28) + 'px'; };
   placeCompass(); addEventListener('resize', placeCompass); if (window.ResizeObserver) new ResizeObserver(placeCompass).observe(footEl);
